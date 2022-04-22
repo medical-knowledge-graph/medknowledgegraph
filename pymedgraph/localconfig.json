@@ -1,0 +1,10 @@
+{
+  "API": {
+    "port": 5050
+  },
+  "NCBI": {
+    "email": "soeren.spiegel@studium.uni-hamburg.de",
+    "tool_name": "MedKnowledgeGraph",
+    "max_articles": 50
+  }
+}
