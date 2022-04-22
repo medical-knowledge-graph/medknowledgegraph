@@ -6,7 +6,7 @@ received data.
 ## package structure
 - pymedgraph.io:
   - get data
-- pymedgraph.ner:
+- pymedgraph.dataextraction:
   - model and methods to get NER from abstracts
 - pymedgraph.graph:
   - build graph relations

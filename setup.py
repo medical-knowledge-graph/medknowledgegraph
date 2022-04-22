@@ -7,7 +7,7 @@ setup(
     packages=[
         'pymedgraph',
         'pymedgraph.io',
-        'pymedgraph.ner',
+        'pymedgraph.dataextraction',
         'pymedgraph.graph'
     ],
     install_requires=[''],
