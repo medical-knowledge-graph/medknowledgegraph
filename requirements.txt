@@ -1,1 +1,5 @@
- biopython==1.79
+setuptools
+wheel
+biopython==1.79
+spacy
+scispacy==0.5.0

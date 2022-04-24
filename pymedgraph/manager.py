@@ -3,6 +3,7 @@ import json
 
 from pymedgraph.io.fetch_ncbi import NCBIFetcher
 from pymedgraph.dataextraction import (
+    MedGraphNER,
     get_mash_terms,
     get_pubmed_id,
     get_keywords,
@@ -19,6 +20,7 @@ class MedGraphManager(object):
     def __init__(self, config_path: str = 'localconfig.json'):
         self.cfg = self._read_config(config_path)
         self.ncbi_fetcher = NCBIFetcher(self.cfg['NCBI']['email'], self.cfg['NCBI']['tool_name'])
+        self.ner = MedGraphNER()
 
     def construct_med_graph(self, request_json):
         """ main method """
@@ -35,11 +37,13 @@ class MedGraphManager(object):
             paper_title = get_pubmed_title(paper)
             mesh_terms = get_mash_terms(paper)
             key_words = get_keywords(paper)
+            named_entities = self.ner.ner_pipe(paper)
             # store results
             paper_dicts[paper_id] = {
                 'title': paper_title,
                 'mesh_terms': mesh_terms,
-                'key_words': key_words
+                'key_words': key_words,
+                'entities': named_entities
             }
 
         return paper_dicts
