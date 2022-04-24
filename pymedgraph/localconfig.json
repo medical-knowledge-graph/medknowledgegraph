@@ -5,6 +5,6 @@
   "NCBI": {
     "email": "soeren.spiegel@studium.uni-hamburg.de",
     "tool_name": "MedKnowledgeGraph",
-    "max_articles": 50
+    "max_articles": 500
   }
 }

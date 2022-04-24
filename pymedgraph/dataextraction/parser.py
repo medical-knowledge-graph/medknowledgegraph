@@ -7,6 +7,7 @@ def get_pubmed_id(paper: dict, sep: str = '~') -> str:
     if not id_list:
         raise RuntimeError('Failed to get pubmed id from paper:', paper)
     if len(id_list) > 1:
+        # TODO: make sure to get pubmed id
         print('WARNING: Found multiple Ids for paper. Might be ignored.', id_list)
     if id_list[0].attributes['IdType'] != 'pubmed':
         print('WARNING: Unexpected `IdType` in IdList. Expected is `pubmed` but found `{it_}`.'.format(

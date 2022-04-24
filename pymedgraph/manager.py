@@ -19,17 +19,24 @@ class MedGraphManager(object):
 
     def __init__(self, config_path: str = 'localconfig.json'):
         self.cfg = self._read_config(config_path)
-        self.ncbi_fetcher = NCBIFetcher(self.cfg['NCBI']['email'], self.cfg['NCBI']['tool_name'])
+        self.ncbi_fetcher = NCBIFetcher(
+            email=self.cfg['NCBI']['email'],
+            tool_name=self.cfg['NCBI']['tool_name'],
+            max_articles=self.cfg['NCBI']['max_articles']
+        )
         self.ner = MedGraphNER()
 
     def construct_med_graph(self, request_json):
         """ main method """
         paper_dicts = dict()
         # get disease and possible filter
-        disease, kwarg = self._parse_request(request_json)
+        disease, request_kwargs = self._parse_request(request_json)
 
         # get articles
-        pubmed_paper = self.ncbi_fetcher.get_pubmed_paper(disease)
+        pubmed_paper = self.ncbi_fetcher.get_pubmed_paper(
+            disease,
+            n_articles=request_kwargs['n_articles'] if 'n_articles' in request_kwargs.keys() else None
+        )
 
         # extract info from response
         for paper in pubmed_paper:
