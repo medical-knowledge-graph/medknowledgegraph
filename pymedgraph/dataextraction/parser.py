@@ -18,6 +18,11 @@ def get_pubmed_id(paper: dict, sep: str = '~') -> str:
 
     return paper_id
 
+def parse_pubmed_article(paper: dict) -> str:
+    """ get article and join different sections of abstract to one """
+    abstract_sections = paper['MedlineCitation']['Article']['Abstract']['AbstractText']
+    return ' '.join(section.title() for section in abstract_sections)
+
 
 def get_pubmed_title(paper: dict) -> str:
     return paper['MedlineCitation']['Article']['ArticleTitle']
