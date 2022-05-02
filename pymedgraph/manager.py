@@ -11,6 +11,15 @@ from pymedgraph.dataextraction import (
 )
 
 
+class ExtractionPipe(object):
+    def __init__(self, name, method):
+        self.name = name
+        self.method = method
+
+    def run_pipe(self, arguments):
+        return self.method(arguments)
+
+
 class MedGraphManager(object):
     """ Class to manage requests and graph build"""
 
@@ -42,16 +51,12 @@ class MedGraphManager(object):
         for paper in pubmed_paper:
             paper_id = get_pubmed_id(paper)
             paper_title = get_pubmed_title(paper)
-            mesh_terms = get_mash_terms(paper)
-            key_words = get_keywords(paper)
-            named_entities = self.ner.ner_pipe(paper)
+            tmp_result_dict = {'title': paper_title}
+            # run pipelines
+            for pipe in request_kwargs['extraction_pipe']:
+                tmp_result_dict[pipe.name] = pipe.run_pipe(paper)
             # store results
-            paper_dicts[paper_id] = {
-                'title': paper_title,
-                'mesh_terms': mesh_terms,
-                'key_words': key_words,
-                'entities': named_entities
-            }
+            paper_dicts[paper_id] = tmp_result_dict
 
         return paper_dicts
 
@@ -66,6 +71,15 @@ class MedGraphManager(object):
         if missing_args:
             raise RuntimeError(f'Missing required parameters in request: {missing_args}')
         disease = request_data.pop(self.DISEASE)
+        # parse pipelines
+        pipelines = list()
+        if request_data.get('mesh_terms'):
+            pipelines.append(ExtractionPipe('mesh_terms', get_mash_terms))
+        if request_data.get('key_words'):
+            pipelines.append(ExtractionPipe('key_words', get_keywords))
+        if request_data.get('entities'):
+            pipelines.append(ExtractionPipe('entities', self.ner.ner_pipe))
+        request_data['extraction_pipe'] = pipelines
         return disease, request_data
 
     @staticmethod
