@@ -27,17 +27,21 @@ class MedGraphManager(object):
     REQUIRED_REQUEST_ARGS = [DISEASE]
 
     def __init__(self, config_path: str = 'localconfig.json'):
+        # read config
         self.cfg = self._read_config(config_path)
+        # init fetcher for api requests to pubmed
         self.ncbi_fetcher = NCBIFetcher(
             email=self.cfg['NCBI']['email'],
             tool_name=self.cfg['NCBI']['tool_name'],
             max_articles=self.cfg['NCBI']['max_articles']
         )
-        self.ner = MedGraphNER()
+        # init named entity extractor
+        self.ner = MedGraphNER('en_ner_bionlp13cg_md')
 
     def construct_med_graph(self, request_json):
         """ main method """
         paper_dicts = dict()
+        entity_links = set()
         # get disease and possible filter
         disease, request_kwargs = self._parse_request(request_json)
 
@@ -53,12 +57,17 @@ class MedGraphManager(object):
             paper_title = get_pubmed_title(paper)
             tmp_result_dict = {'title': paper_title}
             # run pipelines
-            for pipe in request_kwargs['extraction_pipe']:
-                tmp_result_dict[pipe.name] = pipe.run_pipe(paper)
+            if request_kwargs.get('mesh_terms'):
+                tmp_result_dict['mesh_terms'] = get_mash_terms(paper)
+            if request_kwargs.get('key_words'):
+                tmp_result_dict['key_words'] = get_keywords(paper)
+            if request_kwargs.get('entities'):
+                entities, entity_links = self.ner.ner_pipe(paper, entity_links)
+                tmp_result_dict['entities'] = entities
             # store results
             paper_dicts[paper_id] = tmp_result_dict
 
-        return paper_dicts
+        return paper_dicts, entity_links
 
     def _parse_request(self, request_json: str) -> tuple:
         """
