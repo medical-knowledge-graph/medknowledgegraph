@@ -24,7 +24,7 @@ def parse_pubmed_article(paper: dict) -> str:
     """ get article and join different sections of abstract to one """
     try:
         abstract_sections = paper['MedlineCitation']['Article']['Abstract']['AbstractText']
-        abstract = ' '.join(section.title() for section in abstract_sections)
+        abstract = ' '.join(section for section in abstract_sections)
     except KeyError:
         print('WARNING: Found no Abstract in ', paper['MedlineCitation'])
         abstract = ''
