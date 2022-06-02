@@ -18,7 +18,7 @@ class NCBIFetcher(object):
 
     def search_pubmed(self, term: str, n_articles: int = None) -> list:
         """
-        method to first search for term in pubmed and do another fetch with received IDs
+        method to get UID`s from pubmed for given search term. The UID`s are used to fetch the pubmed records
         """
         # make sure to not fetch more articles then set `max_articles`
         if not n_articles or n_articles > self.max_articles:
@@ -31,3 +31,21 @@ class NCBIFetcher(object):
         # get IDs of found articles
         article_ids = record['IdList']
         return article_ids
+
+    def get_medgen_summaries(self, cui:list):
+        uids = self.get_medgen_uids(cui)
+        handle = Entrez.esummary(db='medgen', id=','.join(uids), retmode='xml')
+        # TODO parse records, Entrez.read(handle) does not work!
+        return handle
+
+    def get_medgen_uids(self, cui:list) -> list:
+        """
+        We search UID`s in the NCBI MedGen database with concept IDs (CUI) which we got from the UMLS linkage.
+        The UID`s will be used to get the MedGen summary for the found concept.
+        """
+        # to make only one request for multiple CUI concepts we join the ids with an OR
+        search_term = ' OR '.join(cui)
+        handle = Entrez.esearch(db='medgen', term=search_term)
+        record = Entrez.read(handle)
+        handle.close()
+        return record['IdList']
