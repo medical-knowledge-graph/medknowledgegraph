@@ -12,6 +12,27 @@ received data.
   - build graph relations
 
 # install
+Create a new Environment with <b>Python 3.7</b>, which is required for the scispacy model.
+
+Then clone the repository. 
+Activate your python 3.7 environment and change your directory to the package folder
+````shell
+cd /your/path/to/medknowledgegraph
+````
+Install requirements
+````shell
+pip install -r requirements.txt
+````
+Install the medknowledgegraph package
+````shell
+pip install -e .
+````
+
+Install scispacy model `en_ner_bc5cdr_md` and umls linker.
+https://github.com/allenai/scispacy
+````shell
+pip pip install https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.5.0/en_ner_bc5cdr_md-0.5.0.tar.gz
+````
 
 # run notebook on docker
 Make sure you have docker installed!
