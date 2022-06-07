@@ -3,12 +3,12 @@ import json
 
 from pymedgraph.io.fetch_ncbi import NCBIFetcher
 from pymedgraph.dataextraction import (
-    MedGraphNER,
     get_mash_terms,
     get_pubmed_id,
     get_keywords,
     get_pubmed_title
 )
+from pymedgraph.dataextraction import StandardPubMedPipe, NERPipe, MedGenPipe
 
 
 class ExtractionPipe(object):
@@ -35,15 +35,19 @@ class MedGraphManager(object):
             tool_name=self.cfg['NCBI']['tool_name'],
             max_articles=self.cfg['NCBI']['max_articles']
         )
-        # init named entity extractor
-        self.ner = MedGraphNER('en_ner_bionlp13cg_md')
+
+        # init pipelines
+        self.pubmed_pipe = StandardPubMedPipe()
+        self.ner_pipe = NERPipe(nlp_model='en_ner_bc5cdr_md', entity_linker='umls', depends_on='StandardPubMedPipe')
+        self.medgen_pipe = MedGenPipe(self.ncbi_fetcher, depends_on='NERPipe')
 
     def construct_med_graph(self, request_json):
         """ main method """
-        paper_dicts = dict()
-        entity_links = set()
+
         # get disease and possible filter
         disease, request_kwargs = self._parse_request(request_json)
+
+        pipe_lines = ['StandardPubMedPipe','NERPipe','MedGenPipe']
 
         # get articles
         pubmed_paper = self.ncbi_fetcher.get_pubmed_paper(
@@ -51,23 +55,23 @@ class MedGraphManager(object):
             n_articles=request_kwargs['n_articles'] if 'n_articles' in request_kwargs.keys() else None
         )
 
-        # extract info from response
-        for paper in pubmed_paper:
-            paper_id = get_pubmed_id(paper)
-            paper_title = get_pubmed_title(paper)
-            tmp_result_dict = {'title': paper_title}
-            # run pipelines
-            if request_kwargs.get('mesh_terms'):
-                tmp_result_dict['mesh_terms'] = get_mash_terms(paper)
-            if request_kwargs.get('key_words'):
-                tmp_result_dict['key_words'] = get_keywords(paper)
-            if request_kwargs.get('entities'):
-                entities, entity_links = self.ner.ner_pipe(paper, entity_links)
-                tmp_result_dict['entities'] = entities
-            # store results
-            paper_dicts[paper_id] = tmp_result_dict
+        # build dataframe for pubmed data
+        df_pubmed = self.pubmed_pipe.run(paper=pubmed_paper, search_term=disease, node_label='Paper')
+        output = [df_pubmed]
+        # extract named entities and entity links to UMLS knowledgebase
+        ner_output = self.ner_pipe.run(abstracts=df_pubmed, id_col='$attr$pubmedID', abstract_col='$attr$abstract')
+        df_entity = ner_output[0]
+        output.append(df_entity)
+        if 'MedGenPipe' in pipe_lines:
+            df_links = ner_output[1]
+            output.append(df_links)
+            # fetch data from MedGen
+            medgen_dfs = self.medgen_pipe.run(
+                df_entities=df_entity, df_links=df_links, snomed=True, clinical_features=True
+            )
+            output += medgen_dfs
 
-        return paper_dicts, entity_links
+        return output
 
     def _parse_request(self, request_json: str) -> tuple:
         """
@@ -87,7 +91,7 @@ class MedGraphManager(object):
         if request_data.get('key_words'):
             pipelines.append(ExtractionPipe('key_words', get_keywords))
         if request_data.get('entities'):
-            pipelines.append(ExtractionPipe('entities', self.ner.ner_pipe))
+            pipelines.append(ExtractionPipe('entities', self.ner_pipe.run))
         request_data['extraction_pipe'] = pipelines
         return disease, request_data
 

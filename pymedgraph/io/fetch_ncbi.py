@@ -2,6 +2,9 @@ from Bio import Entrez
 
 
 class NCBIFetcher(object):
+    """
+    Class to make request to NCBI databases via Entrez API
+    """
     def __init__(self, email, tool_name, max_articles=10):
         Entrez.email = email
         Entrez.tool = tool_name
@@ -32,11 +35,15 @@ class NCBIFetcher(object):
         article_ids = record['IdList']
         return article_ids
 
-    def get_medgen_summaries(self, cui:list):
+    def get_medgen_summaries(self, cui:list) -> list:
+        """
+        Get UID´s of MedGen Database and fetch summaries from MedGen
+        """
         uids = self.get_medgen_uids(cui)
         handle = Entrez.esummary(db='medgen', id=','.join(uids), retmode='xml')
-        # TODO parse records, Entrez.read(handle) does not work!
-        return handle
+        records = handle.read()
+        handle.close()
+        return records
 
     def get_medgen_uids(self, cui:list) -> list:
         """
