@@ -1,3 +1,6 @@
+import xml.etree.ElementTree as ET
+
+
 def get_pubmed_id(paper: dict, sep: str = '~') -> str:
     if 'PubmedData' not in paper.keys():
         raise RuntimeError('Got unexpected Pubmed paper dict to retrieve id from:', paper)
@@ -63,3 +66,38 @@ def get_keywords(paper: dict) -> list:
         raise RuntimeWarning('Cannot find KeywordList in paper ', paper)
 
     return found_words
+
+
+def parse_medgen(xml_records, snomed=False, clinical_features=False):
+    """ parse Entrez XML Response """
+    summaries = dict()
+    root = ET.fromstring(xml_records)
+    if not root.tag == 'eSummaryResult':
+        raise RuntimeError('Unexpected XML was passed.')
+    # build dictionary for each summary
+    for summary in root.findall('DocumentSummarySet/DocumentSummary'):
+        # get uid
+        uid = summary.attrib['uid']
+        # build dict
+        summary_dict = dict()
+        summary_dict['cui'] = summary.find('ConceptId').text
+        summary_dict['genes'] = [g.text for g in summary.findall('ConceptMeta/AssociatedGenes/Gene')]
+        if snomed:
+            summary_dict['snomed'] = {
+                sc.attrib['SAUI']: {
+                    'text': sc.text,
+                    'SCUI': sc.attrib['SCUI'],
+                    'SAB': sc.attrib['SAB']
+                } for sc in summary.findall('ConceptMeta/SNOMEDCT/Name')
+            }
+        if clinical_features:
+            summary_dict['clinical_features'] = {
+                cf.attrib['CUI']: {
+                    'type': cf.find('SemanticType').text if cf.find('SemanticType') else '',
+                    'name': cf.find('Name').text if cf.find('Name') else '',
+                    'definition': cf.find('Definition').text if cf.find('Definition') else ''
+                } for cf in summary.findall('ConceptMeta/ClinicalFeatures/ClinicalFeature')
+            }
+        # add dict to results
+        summaries[uid] = summary_dict
+    return summaries
