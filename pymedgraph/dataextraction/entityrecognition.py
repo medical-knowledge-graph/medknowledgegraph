@@ -1,6 +1,7 @@
 import spacy
 import scispacy
-from scispacy.linking import EntityLinker
+from scispacy.linking import EntityLinker  # do NOT remove this import
+from scispacy.abbreviation import AbbreviationDetector  # do NOT remove this import
 
 import pandas as pd
 
