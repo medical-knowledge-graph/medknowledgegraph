@@ -93,9 +93,9 @@ def parse_medgen(xml_records, snomed=False, clinical_features=False):
         if clinical_features:
             summary_dict['clinical_features'] = {
                 cf.attrib['CUI']: {
-                    'type': cf.find('SemanticType').text if cf.find('SemanticType') else '',
-                    'name': cf.find('Name').text if cf.find('Name') else '',
-                    'definition': cf.find('Definition').text if cf.find('Definition') else ''
+                    'type': cf.find('SemanticType').text if cf.find('SemanticType') is not None else '',
+                    'name': cf.find('Name').text if cf.find('Name') is not None else '',
+                    'definition': cf.find('Definition').text if cf.find('Definition') is not None else ''
                 } for cf in summary.findall('ConceptMeta/ClinicalFeatures/ClinicalFeature')
             }
         # add dict to results
