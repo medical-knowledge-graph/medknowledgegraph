@@ -29,21 +29,45 @@ class BasePipe(object):
         self.depends_on = depends_on
 
     def run(self, **kwargs) -> pd.DataFrame:
-        df = self._run_pipe(**kwargs)
-        self._check_output(df)
-        return df
+        output = self._run_pipe(**kwargs)
+        self._check_output(output)
+        return output
 
     def _run_pipe(self, **kwargs) -> pd.DataFrame:
         pass
 
-    def _check_output(self, df: pd.DataFrame):
+    def _check_output(self, output: pd.DataFrame or list):
+        # check if list
+        if isinstance(output, list):
+            for df in output:
+                self._check_df(df)
+        # if not list, output should be a pd.DataFrame
+        else:
+            self._check_df(output)
+
+    def _check_df(self, df: pd.DataFrame):
         # check if dataframe
         if not isinstance(df, pd.DataFrame):
             raise TypeError(f'Output of pipe \'{self.name}\' must be of type pd.DataFrame.')
         # check data for columns
-        for col in df.columns:
-            if col != self.SOURCE_COL and col != self.NODEL_LABEL_COL and not col.startswith(self.NODE_ATTR_PREFIX):
-                raise RuntimeError(f'Found unexpected column name \'{col}\' in output of pipe \'{self.name}\'.')
+        columns = df.columns
+        if self.SOURCE_COL not in columns:
+            raise RuntimeError(
+                f'Source column \'{self.SOURCE_COL}\' is required, but not found in output columns: {columns}.'
+            )
+        if self.NODEL_LABEL_COL not in columns:
+            raise RuntimeError(
+                'Nodel label column \'{nlc}\' is required, but not found in output columns: {c}.'.format(
+                    nlc=self.NODEL_LABEL_COL, c=columns)
+            )
+        if not [c for c in columns if c.startswith(self.NODE_ATTR_PREFIX)]:
+            raise RuntimeError(
+                'Output requires at least one Attribute column with prefix \'{n}\' but was not found in: {c}.'.format(
+                    n=self.NODE_ATTR_PREFIX, c=columns)
+            )
+
+    def _set_column_names(self, columns: list) -> dict:
+        return {col: self._attr_column(col) for col in columns}
 
     def _attr_column(self, column):
         return self.NODE_ATTR_PREFIX + column
