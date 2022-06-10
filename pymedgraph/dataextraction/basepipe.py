@@ -2,6 +2,90 @@ import pandas as pd
 from pymedgraph.dataextraction.parser import get_pubmed_id, get_pubmed_title, get_mash_terms, parse_pubmed_article
 
 
+class NodeTable(object):
+    """
+    Class is used to store a node data table as pd.DataFrame with meta data info, such as node label of source etc
+    """
+    def __init__(self, name, df, source_node, source_node_attr, source_col, node_label, id_attribute, attribute_cols):
+        self.name = name
+        self.meta = {
+            'table_name': name,
+            'source_node': source_node,
+            'source_node_attr': source_node_attr,
+            'source_column': source_col,
+            'node_label': node_label,
+            'id_attribute': id_attribute,
+            'attribute_cols': attribute_cols
+        }
+        self._check_df(df)
+        self.data = df
+
+    @property
+    def meta(self):
+        return self._meta
+
+    @meta.setter
+    def meta(self, m: dict):
+        if not isinstance(m, dict):
+            raise TypeError('NodeTable.meta must be a dict.')
+
+        req_keys = ['table_name', 'source_node', 'source_node_attr', 'source_column',
+                    'node_label', 'id_attribute', 'attribute_cols']
+        missing_keys = [k for k in req_keys if k not in m.keys()]
+        if missing_keys:
+            raise AttributeError(f"NoteTable.meta is missing following keys: {missing_keys}")
+        if not isinstance(m['attribute_cols'], list):
+            raise TypeError(f'NoteTable.meta["attribute_cols"] must be a list.')
+        # keys which require a value
+        req_vals = ['table_name', 'node_label', 'id_attribute', 'attribute_cols']
+        for k, v in m.items():
+            if k in req_vals and v is None:
+                raise AttributeError(f'NoteTable.meta["{k}"] is not allowed to be None.')
+        if m['source_column'] and (m['source_node'] is None or m['source_node_attr'] is None):
+            raise AttributeError(
+                f'If NoteTable.meta["source_column"] is set,'
+                f'"source_node" and "source_node_attr" is not allowed to be None.'
+            )
+        self._meta = m
+
+    def _check_df(self, df: pd.DataFrame):
+        # check if dataframe
+        if not isinstance(df, pd.DataFrame):
+            raise TypeError(f'Output of pipe \'{self.name}\' must be of type pd.DataFrame.')
+        # check data for columns
+        columns = df.columns
+        req_cols = self.meta['attribute_cols'] + [
+            self.meta['source_column'], 'node_label', self.meta['id_attribute']
+        ]
+        for col in req_cols:
+            if col not in columns:
+                raise RuntimeError(f'Given pd.DataFrame is missing required column \'{col}\'.')
+        if list(df['node_label'].unique()) != [self.meta['node_label']]:
+            raise RuntimeError(
+                'Found unexpected values in df["node_label"] {unq_vals}. Expected is \'{nl}\''.format(
+                    unq_vals=df['node_label'].unique(), nl=self.meta["node_label"]
+                )
+            )
+
+
+class PipeOutput(object):
+    """ Class to store pymedgraph.dataextraction.basepipe.NodeTable outputs """
+    def __init__(self, pipe: str):
+        self.pipe = pipe
+        self.node_tables = list()
+
+    def add(self, node_table: NodeTable):
+        if not isinstance(node_table, NodeTable):
+            raise TypeError('Can only add objects of type NodeTable.')
+        self.node_tables.append(node_table)
+
+    def get_table(self, name):
+        for table in self.node_tables:
+            if table.name == name:
+                return table.data
+        return f'Output for pipe {self.pipe} does not contain a NodeTable with name: \'{name}\'.'
+
+
 class BasePipe(object):
     """
 
@@ -13,7 +97,7 @@ class BasePipe(object):
         - MedGen summary --> Gene
         - UniProt
 
-    Output: each pipeline should have the same structure of output
+    Output: each pipeline should have the same structure of output --> NodeTable
 
     DataFrame
 
@@ -28,22 +112,24 @@ class BasePipe(object):
         self.name = pipe_name
         self.depends_on = depends_on
 
-    def run(self, **kwargs) -> pd.DataFrame:
+    def run(self, **kwargs) -> PipeOutput:
         output = self._run_pipe(**kwargs)
         self._check_output(output)
         return output
 
-    def _run_pipe(self, **kwargs) -> pd.DataFrame:
+    def _run_pipe(self, **kwargs) -> PipeOutput:
         pass
 
     def _check_output(self, output: pd.DataFrame or list):
         # check if list
-        if isinstance(output, list):
-            for df in output:
-                self._check_df(df)
+        #if isinstance(output, list):
+        #    for df in output:
+        #        self._check_df(df)
         # if not list, output should be a pd.DataFrame
-        else:
-            self._check_df(output)
+        #else:
+        #    self._check_df(output)
+        if not isinstance(output, PipeOutput):
+            raise TypeError('Pipe output must be an object of type pymedgraph.dataextraction.basepipe.PipeOutput.')
 
     def _check_df(self, df: pd.DataFrame):
         # check if dataframe
@@ -79,10 +165,11 @@ class StandardPubMedPipe(BasePipe):
         super().__init__(pipe_name='StandardPubMedPipe')
         self._attribute_columns = ['pubmedID', 'title', 'abstract']
 
-    def _run_pipe(self, search_term: str, node_label: str, paper: list, mesh_terms=False) -> pd.DataFrame:
+    def _run_pipe(self, search_term: str, node_label: str, paper: list, mesh_terms=False) -> PipeOutput:
         """
         Extract info from PubMed Api Response of found and fetched articles.
         """
+        output = PipeOutput(self.name)
         paper_entries = list()
 
         if mesh_terms:
@@ -90,16 +177,27 @@ class StandardPubMedPipe(BasePipe):
                 paper_entries.append(
                     (get_pubmed_id(pap), get_pubmed_title(pap), parse_pubmed_article(pap), get_mash_terms(pap))
                 )
-            df = pd.DataFrame(paper_entries, columns=[self._attr_column(c) for c in self._attribute_columns + ['MeSH']])
+            df = pd.DataFrame(paper_entries, columns=self._attribute_columns + ['MeSH'])
         else:
             for pap in paper:
                 paper_entries.append(
                     (get_pubmed_id(pap), get_pubmed_title(pap), parse_pubmed_article(pap))
                 )
-            df = pd.DataFrame(paper_entries, columns=[self._attr_column(c) for c in self._attribute_columns])
+            df = pd.DataFrame(paper_entries, columns=self._attribute_columns)
 
         # add required data information
         df[self.SOURCE_COL] = search_term
         df[self.NODEL_LABEL_COL] = node_label
 
-        return df
+        # init NodeTable object and add to Output object
+        output.add(NodeTable(
+            name='pubmedPaper',
+            df=df,
+            source_node='SearchTerm',
+            source_node_attr='label',
+            source_col=self.SOURCE_COL,
+            node_label=node_label,
+            id_attribute='pubmedID',
+            attribute_cols=self._attribute_columns
+        ))
+        return output
