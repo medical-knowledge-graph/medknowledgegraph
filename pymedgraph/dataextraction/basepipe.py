@@ -34,10 +34,10 @@ class NodeTable(object):
         missing_keys = [k for k in req_keys if k not in m.keys()]
         if missing_keys:
             raise AttributeError(f"NoteTable.meta is missing following keys: {missing_keys}")
-        if not isinstance(m['attribute_cols'], list):
+        if m['attribute_cols'] and not isinstance(m['attribute_cols'], list):
             raise TypeError(f'NoteTable.meta["attribute_cols"] must be a list.')
         # keys which require a value
-        req_vals = ['table_name', 'node_label', 'id_attribute', 'attribute_cols']
+        req_vals = ['table_name', 'node_label', 'id_attribute']
         for k, v in m.items():
             if k in req_vals and v is None:
                 raise AttributeError(f'NoteTable.meta["{k}"] is not allowed to be None.')
@@ -54,18 +54,28 @@ class NodeTable(object):
             raise TypeError(f'Output of pipe \'{self.name}\' must be of type pd.DataFrame.')
         # check data for columns
         columns = df.columns
-        req_cols = self.meta['attribute_cols'] + [
-            self.meta['source_column'], 'node_label', self.meta['id_attribute']
-        ]
+        req_cols = [self.meta['source_column'], 'node_label', self.meta['id_attribute']]
+        if self.meta['attribute_cols']:
+            req_cols += self.meta['attribute_cols']
         for col in req_cols:
             if col not in columns:
                 raise RuntimeError(f'Given pd.DataFrame is missing required column \'{col}\'.')
-        if list(df['node_label'].unique()) != [self.meta['node_label']]:
-            raise RuntimeError(
-                'Found unexpected values in df["node_label"] {unq_vals}. Expected is \'{nl}\''.format(
-                    unq_vals=df['node_label'].unique(), nl=self.meta["node_label"]
+        if isinstance(self.meta['node_label'], list):
+            if list(df['node_label'].unique()) != self.meta['node_label']:
+                raise RuntimeError(
+                    'Found unexpected values in df["node_label"] {unq_vals}. Expected is \'{nl}\''.format(
+                        unq_vals=df['node_label'].unique(), nl=self.meta["node_label"]
+                    )
                 )
-            )
+        else:
+            if df['node_label'].nunique() != 1:
+                raise RuntimeError('Found unexpected node labels {unq_vals}. Expects: {nl}'.format(
+                    unq_vals=df['node_label'].unique(), nl=self.meta["node_label"]
+                ))
+            if df['node_label'].unique()[0] != self.meta['node_label']:
+                raise RuntimeError('Found NodeLabel \'{fnl}\' is not expected node label: \'{nl}\''.format(
+                    fnl=df['node_label'].unique()[0], nl=self.meta['node_label']
+                ))
 
 
 class PipeOutput(object):
