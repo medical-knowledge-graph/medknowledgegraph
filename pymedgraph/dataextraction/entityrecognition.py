@@ -5,7 +5,7 @@ from scispacy.abbreviation import AbbreviationDetector  # do NOT remove this imp
 
 import pandas as pd
 
-from pymedgraph.dataextraction.basepipe import BasePipe
+from pymedgraph.dataextraction.basepipe import BasePipe, PipeOutput, NodeTable
 
 
 class NERPipe(BasePipe):
@@ -31,6 +31,10 @@ class NERPipe(BasePipe):
         self.columns = self._set_column_names(['text', 'CUI', 'Definition', 'name'])
 
     def _run_pipe(self, abstracts: pd.DataFrame, id_col: str, abstract_col: str):
+        """
+        Extract NamedEntities and Linkage to UMLS Knowledgebase
+        """
+        output = PipeOutput(self.name)
 
         named_entities = list() # contains tuples (i, t, l) i=paper id, t=entity text, l=entity label
         entity_links = set()  # contains tuples (t, c, s) t=entity text, c=CUI of entity link, s=score of entity link
@@ -58,27 +62,41 @@ class NERPipe(BasePipe):
         # build DataFrames
         df_entities = pd.DataFrame(
             named_entities,
-            columns=[self.SOURCE_COL, self.columns['text'], self.NODEL_LABEL_COL]
+            columns=[self.SOURCE_COL, 'text', self.NODEL_LABEL_COL]
         )
 
-        output = [df_entities]
+        output.add(NodeTable(
+            name='Entities',
+            df=df_entities,
+            source_node='Paper',
+            source_node_attr='pubmedID',
+            source_col=self.SOURCE_COL,
+            node_label=list(df_entities[self.NODEL_LABEL_COL].unique()),
+            id_attribute='text',
+            attribute_cols=''
+        ))
 
         if entity_links:
             df_entity_links = self._build_entity_links_df(entity_links)
-            output.append(df_entity_links)
+            output.add(NodeTable(
+                name='UmlsLinks',
+                df=df_entity_links,
+                source_node=list(df_entities[self.NODEL_LABEL_COL].unique()),
+                source_node_attr='text',
+                source_col=self.SOURCE_COL,
+                node_label='UMLS',
+                id_attribute='CUI',
+                attribute_cols=['name', 'Definition']
+            ))
 
         return output
 
     def _build_entity_links_df(self, entity_links: set) -> pd.DataFrame:
         # build df
-        df = pd.DataFrame(entity_links, columns=[self.SOURCE_COL, self.columns['CUI'], 'kb_score'])
+        df = pd.DataFrame(entity_links, columns=[self.SOURCE_COL, 'CUI', 'kb_score'])
         # add umls concept name
-        df[self.columns['name']] = df[self.columns['CUI']].apply(
-            lambda x: self.linker.kb.cui_to_entity[x].canonical_name
-        )
+        df['name'] = df['CUI'].apply(lambda x: self.linker.kb.cui_to_entity[x].canonical_name)
         # .. and definition
-        df[self.columns['Definition']] = df[self.columns['CUI']].apply(
-            lambda x: self.linker.kb.cui_to_entity[x].definition
-        )
+        df['Definition'] = df['CUI'].apply(lambda x: self.linker.kb.cui_to_entity[x].definition)
         df[self.NODEL_LABEL_COL] = 'UMLS'
         return df
