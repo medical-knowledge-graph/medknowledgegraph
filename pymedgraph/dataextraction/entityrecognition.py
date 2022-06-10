@@ -30,7 +30,7 @@ class NERPipe(BasePipe):
 
         self.columns = self._set_column_names(['text', 'CUI', 'Definition', 'name'])
 
-    def _run_pipe(self, abstracts: pd.DataFrame, id_col: str, abstract_col: str):
+    def _run_pipe(self, abstracts: pd.DataFrame, id_col: str, abstract_col: str) -> PipeOutput:
         """
         Extract NamedEntities and Linkage to UMLS Knowledgebase
         """
