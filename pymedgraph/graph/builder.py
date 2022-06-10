@@ -12,6 +12,112 @@ class Neo4jBuilder(object):
     def __init__(self, uri, user, password):
         self.driver = GraphDatabase.driver(uri, auth=(user, password))
 
+    def build_biomed_graph(self, disease: str, pipe_outputs):
+        """
+        :param disease: str - name of search term
+        :param pipe_outputs: list - contains pymedgraph.dataextraction.basepipe.PipeOutput objects
+        """
+        self._init_new_neo4j_graph(disease)
+        for output in pipe_outputs:
+            for node_table in output.node_tables:
+                self.upload_nodetable(node_table)
+
+    def upload_nodetable(self, node_table):
+        # determine if node table contains multiple node labels
+        if isinstance(node_table.meta['node_label'], list):
+            for node_label in node_table.meta['node_label']:
+                # get query for table
+                query = self._create_node_query(node_table.meta, node_label)
+                # do upload
+                self.insert_data(
+                    query,
+                    self.filter_node_data(node_table, filter_label=node_label, drop_duplicates=True)
+                )
+                # TODO: ugly -.-
+                if isinstance(node_table.meta['source_node'], list):
+
+                    for source_node in node_table.meta['source_node']:
+                        # get query for relations
+                        query = self._create_node_relation_query(node_table.meta, node_label, source_node)
+                        # do upload
+                        self.insert_data(
+                            query,
+                            self.filter_node_data(node_table, filter_label=node_label, drop_duplicates=False)
+                        )
+                else:
+                    query = self._create_node_relation_query(
+                        node_table.meta, node_label, node_table.meta['source_node']
+                    )
+                    # do upload
+                    self.insert_data(
+                        query,
+                        self.filter_node_data(node_table, filter_label=node_label, drop_duplicates=False)
+                    )
+        else:
+            # get query for table
+            query = self._create_node_query(node_table.meta, node_table.meta['node_label'])
+            # do upload
+            self.insert_data(query, self.filter_node_data(node_table, drop_duplicates=True))
+            if isinstance(node_table.meta['source_node'], list):
+                print('correct')
+                for source_node in node_table.meta['source_node']:
+                    # get query for relations
+                    query = self._create_node_relation_query(node_table.meta, node_table.meta['node_label'], source_node)
+                    # do upload
+                    self.insert_data(query, self.filter_node_data(node_table))
+            else:
+                print('wrong')
+                query = self._create_node_relation_query(
+                    node_table.meta, node_table.meta['node_label'], node_table.meta['source_node']
+                )
+                # do upload
+                self.insert_data(query, node_table.data)
+
+    @staticmethod
+    def filter_node_data(node_table, filter_label=None, drop_duplicates=False) -> pd.DataFrame:
+        if filter_label:
+            df = node_table.data[node_table.data['node_label'] == filter_label]
+        else:
+            df = node_table.data
+        if drop_duplicates:
+            df = df.drop_duplicates(subset=[node_table.meta['id_attribute']])
+        return df
+
+    @staticmethod
+    def get_node_data(node_table):
+        return node_table.data.drop_duplicates(subset=[node_table.meta['id_attribute']])
+
+    @staticmethod
+    def _create_node_query(node_table_meta: dict, node_label: str):
+        """ Build query to upload nodes with attributes """
+        # collect columns
+        attribute_cols = [node_table_meta['id_attribute']]
+        if node_table_meta['attribute_cols']:
+            attribute_cols += node_table_meta['attribute_cols']
+        # build string for node attributes
+        node_attr_string = ''
+        for i, col in enumerate(attribute_cols):
+            node_attr_string += f'{col}: row.{col}'
+            if i + 1 != len(attribute_cols):
+                node_attr_string += ', '
+        # build node string
+        node_string = 'CREATE (n: {n} {{{attr}}})'.format(n=node_label, attr=node_attr_string)
+        # build final query
+        query = 'UNWIND $rows AS row ' + node_string + ' RETURN count(*) as total'
+        return query
+
+    @staticmethod
+    def _create_node_relation_query(node_table_meta: dict, node_label: str, source_node_label: str):
+        """ Build query to upload node relations to source nodes """
+        match_query = 'MATCH (a: {A}), (b: {B})'.format(A=source_node_label, B=node_label)
+        where_query = 'WHERE a.{a_attr} = row.{a_col} AND b.{b_attr_col} = row.{b_attr_col}'.format(
+            a_attr=node_table_meta['source_node_attr'], a_col=node_table_meta['source_column'],
+            b_attr_col=node_table_meta['id_attribute']
+        )
+        query = 'UNWIND $rows AS row ' + match_query + ' ' + where_query + \
+                ' CREATE (a)-[:CONTAINS]->(b) RETURN count(*) as total'
+        return query
+
     def build_graph(self, disease: str, paper: dict, entity_links: set):
         """
         Method to create new graph on neo4j instance.
@@ -180,7 +286,7 @@ class Neo4jBuilder(object):
         delete_query = "MATCH (n) DETACH DELETE n"
         response = self.query(delete_query, None)
         print(response)
-        init_query = "CREATE (d:Disease {label: $disease})"
+        init_query = "CREATE (st:SearchTerm {label: $disease})"
         response = self.query(init_query, {'disease': disease})
         print(response)
 
