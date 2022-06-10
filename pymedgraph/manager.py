@@ -43,7 +43,7 @@ class MedGraphManager(object):
 
     def construct_med_graph(self, request_json):
         """ main method """
-
+        outputs = list()
         # get disease and possible filter
         disease, request_kwargs = self._parse_request(request_json)
 
@@ -56,22 +56,23 @@ class MedGraphManager(object):
         )
 
         # build dataframe for pubmed data
-        df_pubmed = self.pubmed_pipe.run(paper=pubmed_paper, search_term=disease, node_label='Paper')
-        output = [df_pubmed]
+        pubmed_output = self.pubmed_pipe.run(paper=pubmed_paper, search_term=disease, node_label='Paper')
+        outputs.append(pubmed_output)
         # extract named entities and entity links to UMLS knowledgebase
-        ner_output = self.ner_pipe.run(abstracts=df_pubmed, id_col='$attr$pubmedID', abstract_col='$attr$abstract')
-        df_entity = ner_output[0]
-        output.append(df_entity)
+        ner_output = self.ner_pipe.run(
+            abstracts=pubmed_output.get_table('pubmedPaper'), id_col='pubmedID', abstract_col='abstract'
+        )
+        outputs.append(ner_output)
+        df_entity = ner_output.get_table('Entities')
         if 'MedGenPipe' in pipe_lines:
-            df_links = ner_output[1]
-            output.append(df_links)
+            df_links = ner_output.get_table('UmlsLinks')
             # fetch data from MedGen
-            medgen_dfs = self.medgen_pipe.run(
+            medgen_output = self.medgen_pipe.run(
                 df_entities=df_entity, df_links=df_links, snomed=True, clinical_features=True
             )
-            output += medgen_dfs
+            outputs.append(medgen_output)
 
-        return output
+        return outputs
 
     def _parse_request(self, request_json: str) -> tuple:
         """
