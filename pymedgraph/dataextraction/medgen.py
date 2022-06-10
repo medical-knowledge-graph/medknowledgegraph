@@ -1,7 +1,7 @@
 import pandas as pd
 from pymedgraph.io.fetch_ncbi import NCBIFetcher
 from pymedgraph.dataextraction.parser import parse_medgen
-from pymedgraph.dataextraction.basepipe import BasePipe
+from pymedgraph.dataextraction.basepipe import BasePipe, PipeOutput, NodeTable
 
 class MedGenPipe(BasePipe):
     """
@@ -12,12 +12,21 @@ class MedGenPipe(BasePipe):
 
         self.fetcher = ncbi_fetcher
 
-        self.columns  = self._set_column_names(
-            ['gene', 'SAUI', 'snomed_text', 'SCUI', 'SAB', 'CUI', 'type', 'name', 'definition']
-        )
+    @property
+    def fetcher(self):
+        return self._fetcher
+
+    @fetcher.setter
+    def fetcher(self, f):
+        if not isinstance(f, NCBIFetcher):
+            AttributeError('MedGenPipe.fetcher must be an pymedgraph.io.fetch_ncbi.NCBIFetcher instance.')
+        self._fetcher = f
 
     def _run_pipe(self, df_entities: pd.DataFrame, df_links: pd.DataFrame,
-                  snomed=False, clinical_features=False) -> list:
+                  snomed=False, clinical_features=False) -> PipeOutput:
+
+        output = PipeOutput(self.name)
+
         # select IDs
         cuis = self._select_cui(df_entities, df_links)
         # get data
@@ -27,13 +36,40 @@ class MedGenPipe(BasePipe):
 
         # build DataFrames
         df_gene = self._build_gene_df(medgen_summaries)
-        output = [df_gene]
+        output.add(NodeTable(
+            name='Genes',
+            df=df_gene,
+            source_node='UMLS',
+            source_node_attr='CUI',
+            source_col=self.SOURCE_COL,
+            node_label='Gene',
+            id_attribute='gene',
+            attribute_cols=''
+        ))
         if snomed:
             df_snomed = self._build_snomed_df(medgen_summaries)
-            output.append(df_snomed)
+            output.add(NodeTable(
+                name='Snomed',
+                df=df_snomed,
+                source_node='UMLS',
+                source_node_attr='CUI',
+                source_col=self.SOURCE_COL,
+                node_label='SnomedConcept',
+                id_attribute='SAUI',
+                attribute_cols=['snomed_text', 'SCUI', 'SAB']
+            ))
         if clinical_features:
             df_cf = self._build_clinical_features_df(medgen_summaries)
-            output.append(df_cf)
+            output.add(NodeTable(
+                name='ClinicalFeats',
+                df=df_cf,
+                source_node='UMLS',
+                source_node_attr='CUI',
+                source_col=self.SOURCE_COL,
+                node_label='ClinicalFeature',
+                id_attribute='CUI',
+                attribute_cols=['type', 'name', 'definition']
+            ))
 
         return output
 
@@ -41,12 +77,12 @@ class MedGenPipe(BasePipe):
         """ Filter for N CUI ids """
         cuis = list()
         # select n most found entities
-        entities = df_entity[df_entity[self.NODEL_LABEL_COL] == 'DISEASE']['$attr$text'].value_counts()[:n_].index.tolist()
+        entities = df_entity[df_entity[self.NODEL_LABEL_COL] == 'DISEASE']['text'].value_counts()[:n_].index.tolist()
         # get n cui ids for each entity
         for ent in entities:
             links = df_links[
                         (df_links[self.SOURCE_COL] == ent) & (df_links['kb_score'] > 0.9)
-                        ].sort_values(by='kb_score', ascending=False)['$attr$CUI'].values.tolist()[:cui_n]
+                        ].sort_values(by='kb_score', ascending=False)['CUI'].values.tolist()[:cui_n]
             if links:
                 cuis += links
         return cuis
@@ -56,7 +92,7 @@ class MedGenPipe(BasePipe):
         for k, summary in summaries.items():
             for gene in summary['genes']:
                 data.append((summary['cui'], gene))
-        df = pd.DataFrame(data, columns=[self.SOURCE_COL, self.columns['gene']])
+        df = pd.DataFrame(data, columns=[self.SOURCE_COL, 'gene'])
         df[self.NODEL_LABEL_COL] = 'Gene'
         return df
 
@@ -65,9 +101,7 @@ class MedGenPipe(BasePipe):
         for k, summary in summaries.items():
             for id_, concept in summary['snomed'].items():
                 data.append((summary['cui'], id_, concept['text'], concept['SCUI'], concept['SAB']))
-        df = pd.DataFrame(data, columns=[
-            self.SOURCE_COL, self.columns['SAUI'], self.columns['snomed_text'], self.columns['SCUI'],
-            self.columns['SAB']])
+        df = pd.DataFrame(data, columns=[self.SOURCE_COL, 'SAUI', 'snomed_text', 'SCUI','SAB'])
         df[self.NODEL_LABEL_COL] = 'SnomedConcept'
         return df
 
@@ -78,7 +112,6 @@ class MedGenPipe(BasePipe):
                 data.append((summary['cui'], cui, feature['type'], feature['name'], feature['definition']))
         df = pd.DataFrame(
             data,
-            columns=[self.SOURCE_COL, self.columns['CUI'], self.columns['type'], self.columns['name'],
-                     self.columns['definition']])
+            columns=[self.SOURCE_COL, 'CUI', 'type', 'name', 'definition'])
         df[self.NODEL_LABEL_COL] = 'ClinicalFeature'
         return df
