@@ -1,8 +1,6 @@
 import json
 from flask import Flask, render_template, request, abort, jsonify
-
 from pymedgraph.manager import MedGraphManager
-from pymedgraph.graph.builder import Neo4jBuilder
 
 app = Flask(__name__)
 
@@ -18,7 +16,7 @@ def get_json():
             if 'text' in request_json:
                 results = send_keyword(request_json['text'])
 
-                return res
+                return results
             abort(400, 'JSON data missing text field.')
         abort(415)
     abort(405)
