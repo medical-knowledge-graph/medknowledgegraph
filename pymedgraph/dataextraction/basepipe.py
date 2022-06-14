@@ -7,6 +7,18 @@ class NodeTable(object):
     Class is used to store a node data table as pd.DataFrame with meta data info, such as node label of source etc
     """
     def __init__(self, name, df, source_node, source_node_attr, source_col, node_label, id_attribute, attribute_cols):
+        """
+
+        :param name: str - name of node table. Should be used as identifier, if you are creating a table for gene nodes
+        you want to name the NodeTable instance `genes`.
+        :param df: pd.DataFrame - contains info about the node. See above
+        :param source_node: str or list
+        :param source_node_attr: str
+        :param source_col: str
+        :param node_label: str or list
+        :param id_attribute: str
+        :param attribute_cols: list
+        """
         self.name = name
         self.meta = {
             'table_name': name,
@@ -35,7 +47,7 @@ class NodeTable(object):
         if missing_keys:
             raise AttributeError(f"NoteTable.meta is missing following keys: {missing_keys}")
         if m['attribute_cols'] and not isinstance(m['attribute_cols'], list):
-            raise TypeError(f'NoteTable.meta["attribute_cols"] must be a list.')
+            raise TypeError('NoteTable.meta["attribute_cols"] must be a list.')
         # keys which require a value
         req_vals = ['table_name', 'node_label', 'id_attribute']
         for k, v in m.items():

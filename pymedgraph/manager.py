@@ -72,7 +72,7 @@ class MedGraphManager(object):
             )
             outputs.append(medgen_output)
 
-        return outputs
+        return disease, outputs
 
     def _parse_request(self, request_json: str) -> tuple:
         """
@@ -85,6 +85,34 @@ class MedGraphManager(object):
         if missing_args:
             raise RuntimeError(f'Missing required parameters in request: {missing_args}')
         disease = request_data.pop(self.DISEASE)
+        # TODO Oweys: get pipelines from json and other keywords
+        """
+        So koennte ich mir vorstellen, dass ein request JSON von Lorenz Frontend aussehen wird.
+        Die Argumente für die Pipes können schon teilweise einfach in deren run() Methode übergeben werden, wie für
+        die medGen pipe oder müssen noch implementiert werden.
+        
+           example_json = {
+                'disease': 'phenylketonurie',
+                'n_articles': 100, # number of articles to be fetched
+                'pipelines': {
+                    'pubmed': {
+                        'run': True,  # this database is required and must be set
+                        'meshTerms': True  # flag if MeSH terms shall be extracted
+                        },
+                    'ner': {
+                        'run': True,
+                        'entityLinks': True  # flag if links to UMLS knowledge base shall be extracted --> required for farther pipelines
+                        },
+                    'medGen': {
+                        'run': True,
+                        'Snomed': True, # flag if SnomedConcepts are extracted
+                        'clinicalFeatures': False # flag for clinical Features
+                    },
+                    'uniProt': {} # TODO: Sönke muss die noch implementieren
+                }
+            }
+        """
+        # the following statements can be deleted
         # parse pipelines
         pipelines = list()
         if request_data.get('mesh_terms'):
@@ -94,6 +122,7 @@ class MedGraphManager(object):
         if request_data.get('entities'):
             pipelines.append(ExtractionPipe('entities', self.ner_pipe.run))
         request_data['extraction_pipe'] = pipelines
+
         return disease, request_data
 
     @staticmethod

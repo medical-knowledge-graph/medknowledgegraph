@@ -73,8 +73,8 @@ class MedGenPipe(BasePipe):
 
         return output
 
-    def _select_cui(self, df_entity: pd.DataFrame, df_links: pd.DataFrame, n_=5, cui_n=3) -> list:
-        """ Filter for N CUI ids """
+    def _select_cui(self, df_entity: pd.DataFrame, df_links: pd.DataFrame, n_=15, cui_n=3) -> list:  # TODO oweys: könnte man auch in JSON packen
+        """ Filter for n CUI ids """
         cuis = list()
         # select n most found entities
         entities = df_entity[df_entity[self.NODEL_LABEL_COL] == 'DISEASE']['text'].value_counts()[:n_].index.tolist()

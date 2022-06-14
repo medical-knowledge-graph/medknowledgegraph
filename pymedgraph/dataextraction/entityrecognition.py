@@ -64,6 +64,7 @@ class NERPipe(BasePipe):
             named_entities,
             columns=[self.SOURCE_COL, 'text', self.NODEL_LABEL_COL]
         )
+        # TODO oweys: text lower and remove possible duplicates but with subset for `pubmedID` and `text` cols
 
         output.add(NodeTable(
             name='Entities',
