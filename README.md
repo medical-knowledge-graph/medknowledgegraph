@@ -34,6 +34,12 @@ https://github.com/allenai/scispacy
 pip install https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.5.0/en_ner_bc5cdr_md-0.5.0.tar.gz
 ````
 
+Use following command to solve possible confilct issues with spacy (or install spaCy v3.2):
+````
+pip install -U spacy
+````
+
+
 # run api
 Activate your python 3.7 environment and change your directory to the package folder
 ````shell
