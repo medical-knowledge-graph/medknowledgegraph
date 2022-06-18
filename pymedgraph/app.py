@@ -1,5 +1,7 @@
 import json
 from flask import Flask, render_template, request, abort, jsonify
+
+from pymedgraph.graph.builder import Neo4jBuilder
 from pymedgraph.manager import MedGraphManager
 
 app = Flask(__name__)
@@ -7,6 +9,7 @@ app = Flask(__name__)
 manager = MedGraphManager(config_path='./pymedgraph/localconfig.json')
 neo4j_cfg = manager.cfg.get('Neo4j')
 neo4j = Neo4jBuilder(neo4j_cfg['url'], neo4j_cfg['user'], neo4j_cfg['pw'])
+
 
 @app.route("/", methods=["POST"])
 def get_json():
@@ -36,6 +39,7 @@ def send_keyword(keyword):
     else:
         msg = 'fail'
     return msg
-    
+
+
 if __name__ == "__main__":
     app.run(port=9000, debug = True)
