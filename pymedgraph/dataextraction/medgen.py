@@ -1,4 +1,6 @@
 import pandas as pd
+import json
+
 from pymedgraph.io.fetch_ncbi import NCBIFetcher
 from pymedgraph.dataextraction.parser import parse_medgen
 from pymedgraph.dataextraction.basepipe import BasePipe, PipeOutput, NodeTable
@@ -73,7 +75,7 @@ class MedGenPipe(BasePipe):
 
         return output
 
-    def _select_cui(self, df_entity: pd.DataFrame, df_links: pd.DataFrame, n_=15, cui_n=3) -> list:  # TODO oweys: könnte man auch in JSON packen
+    def _select_cui(self, df_entity: pd.DataFrame, df_links: pd.DataFrame, n_=15, cui_n=3) -> json.dumps:
         """ Filter for n CUI ids """
         cuis = list()
         # select n most found entities
@@ -85,7 +87,12 @@ class MedGenPipe(BasePipe):
                         ].sort_values(by='kb_score', ascending=False)['CUI'].values.tolist()[:cui_n]
             if links:
                 cuis += links
-        return cuis
+
+        # save list as json
+        cuis_dict = {'cuis':cuis}
+        cuis_json = json.dumps(cuis_dict)
+
+        return cuis_json
 
     def _build_gene_df(self, summaries: dict) -> pd.DataFrame:
         data = list()
