@@ -64,7 +64,10 @@ class NERPipe(BasePipe):
             named_entities,
             columns=[self.SOURCE_COL, 'text', self.NODEL_LABEL_COL]
         )
-        # TODO oweys: text lower and remove possible duplicates but with subset for `pubmedID` and `text` cols
+
+        # text lower and remove possible duplicates but with subset for `pubmedID` and `text` cols
+        df_entities['text'] = df_entities['text'].str.lower()
+        df_entities.drop_duplicates(subset=['text', 'pubmedID'], inplace=True)
 
         output.add(NodeTable(
             name='Entities',
