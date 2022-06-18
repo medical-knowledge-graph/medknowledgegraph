@@ -1,6 +1,7 @@
 import json
 from flask import Flask, render_template, request, abort, jsonify
 from pymedgraph.manager import MedGraphManager
+from pymedgraph.graph.builder import Neo4jBuilder
 
 app = Flask(__name__)
 
