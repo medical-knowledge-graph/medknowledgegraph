@@ -87,6 +87,12 @@ class MedGraphManager(object):
         disease = request_data.pop(self.DISEASE)
         # TODO Oweys: get pipelines from json and other keywords
         """
+            Verstehe ich das richtig: du möchtest, dass ich die pipelines initialisiere?
+            Wird das nicht bereits bei construct_med_graph für alle drei pipelines gemacht?
+            
+        """
+
+        """
         So koennte ich mir vorstellen, dass ein request JSON von Lorenz Frontend aussehen wird.
         Die Argumente für die Pipes können schon teilweise einfach in deren run() Methode übergeben werden, wie für
         die medGen pipe oder müssen noch implementiert werden.
