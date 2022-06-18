@@ -33,7 +33,9 @@ https://github.com/allenai/scispacy
 ````shell
 pip pip install https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.5.0/en_ner_bc5cdr_md-0.5.0.tar.gz
 ````
-
+````
+pip install https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.4.0/en_ner_bionlp13cg_md-0.4.0.tar.gz
+````
 # run api
 Activate your python 3.7 environment and change your directory to the package folder
 ````shell
