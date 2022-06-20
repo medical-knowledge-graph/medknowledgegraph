@@ -1,6 +1,6 @@
 import pandas as pd
 from pymedgraph.dataextraction.basepipe import BasePipe, PipeOutput, NodeTable
-from pymedgraph.io.uniprot import get_uniprot_entry
+from pymedgraph.input.uniprot import get_uniprot_entry
 
 
 class UniProtPipe(BasePipe):

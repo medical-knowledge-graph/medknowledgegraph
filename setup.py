@@ -6,7 +6,7 @@ setup(
     description='Build graph from med abstracts and more',
     packages=[
         'pymedgraph',
-        'pymedgraph.io',
+        'pymedgraph.input',
         'pymedgraph.dataextraction',
         'pymedgraph.graph'
     ],

@@ -1,7 +1,7 @@
 import pandas as pd
 import json
 
-from pymedgraph.io.fetch_ncbi import NCBIFetcher
+from pymedgraph.input.fetch_ncbi import NCBIFetcher
 from pymedgraph.dataextraction.parser import parse_medgen
 from pymedgraph.dataextraction.basepipe import BasePipe, PipeOutput, NodeTable
 
@@ -21,7 +21,7 @@ class MedGenPipe(BasePipe):
     @fetcher.setter
     def fetcher(self, f):
         if not isinstance(f, NCBIFetcher):
-            AttributeError('MedGenPipe.fetcher must be an pymedgraph.io.fetch_ncbi.NCBIFetcher instance.')
+            AttributeError('MedGenPipe.fetcher must be an pymedgraph.input.fetch_ncbi.NCBIFetcher instance.')
         self._fetcher = f
 
     def _run_pipe(self, df_entities: pd.DataFrame, df_links: pd.DataFrame,
@@ -75,8 +75,16 @@ class MedGenPipe(BasePipe):
 
         return output
 
-    def _select_cui(self, df_entity: pd.DataFrame, df_links: pd.DataFrame, n_=15, cui_n=3) -> json.dumps:
-        """ Filter for n CUI ids """
+    def _select_cui(self, df_entity: pd.DataFrame, df_links: pd.DataFrame, n_=30, cui_n=3) -> json.dumps:
+        """
+        Filter for n CUI ids. Filtering is done by selecting most popular entities found in paper and then selecting
+        `cui_n` UMLS concepts to request MedGen.
+
+        :param df_entity: pd.DataFrame - contains entities, used to select n most mentioned entities
+        :param df_links: pd.DataFrame - umls concepts, used to select concepts CUI for MedGen fetch
+        :param n_: int - number of top n most entities, which will be selected for CUI selection
+        :param cui_n: int - of n_ entities cui_n are selected for actual MedGen request
+        """
         cuis = list()
         # select n most found entities
         entities = df_entity[df_entity[self.NODEL_LABEL_COL] == 'DISEASE']['text'].value_counts()[:n_].index.tolist()
@@ -89,7 +97,7 @@ class MedGenPipe(BasePipe):
                 cuis += links
 
         # save list as json
-        cuis_dict = {'cuis':cuis}
+        cuis_dict = {'cuis':list(set(cuis))}
         cuis_json = json.dumps(cuis_dict)
 
         return cuis_json

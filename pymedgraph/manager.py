@@ -1,7 +1,7 @@
 import os
 import json
 
-from pymedgraph.io.fetch_ncbi import NCBIFetcher
+from pymedgraph.input.fetch_ncbi import NCBIFetcher
 from pymedgraph.dataextraction import (
     get_mash_terms,
     get_pubmed_id,
@@ -59,7 +59,10 @@ class MedGraphManager(object):
             df_links = ner_output.get_table('UmlsLinks')
             # fetch data from MedGen
             medgen_output = self.medgen_pipe.run(
-                df_entities=df_entity, df_links=df_links, snomed=True, clinical_features=True
+                df_entities=df_entity,
+                df_links=df_links,
+                snomed=pipe_cfg['pipelines']['medGen']['Snomed'],
+                clinical_features=pipe_cfg['pipelines']['medGen']['clinicalFeatures']
             )
             outputs.append(medgen_output)
 
@@ -103,6 +106,12 @@ class MedGraphManager(object):
         pipes = dict()
         for pipe, v in request_data['pipelines'].items():
             if v['run']:
+                # special MedGen case
+                if pipe == 'medGen':
+                    for k in ['Snomed', 'clinicalFeatures']:
+                        if k not in v:
+                            v[k] = False
+                # add pipe value to dict
                 pipes[pipe] = v
         pipe_run_cfg['pipelines'] = pipes
         self._check_pipeline(list(pipes.keys()))
