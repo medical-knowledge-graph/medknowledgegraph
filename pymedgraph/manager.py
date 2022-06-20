@@ -11,20 +11,13 @@ from pymedgraph.dataextraction import (
 from pymedgraph.dataextraction import StandardPubMedPipe, NERPipe, MedGenPipe
 
 
-class ExtractionPipe(object):
-    def __init__(self, name, method):
-        self.name = name
-        self.method = method
-
-    def run_pipe(self, arguments):
-        return self.method(arguments)
-
 
 class MedGraphManager(object):
     """ Class to manage requests and graph build"""
 
     DISEASE = 'disease'
-    REQUIRED_REQUEST_ARGS = [DISEASE]
+    REQUIRED_REQUEST_ARGS = [DISEASE, 'pipelines']
+    PIPE_HIERARCHY = ['pubmed', 'ner', 'medGen', 'uniProt']
 
     def __init__(self, config_path: str = 'localconfig.json'):
         # read config
@@ -45,14 +38,12 @@ class MedGraphManager(object):
         """ main method """
         outputs = list()
         # get disease and possible filter
-        disease, request_kwargs = self._parse_request(request_json)
-
-        pipe_lines = ['StandardPubMedPipe','NERPipe','MedGenPipe']
+        disease, pipe_cfg = self._parse_request(request_json)
 
         # get articles
         pubmed_paper = self.ncbi_fetcher.get_pubmed_paper(
             disease,
-            n_articles=request_kwargs['n_articles'] if 'n_articles' in request_kwargs.keys() else None
+            n_articles=pipe_cfg['n_articles'] if 'n_articles' in pipe_cfg.keys() else None
         )
 
         # build dataframe for pubmed data
@@ -64,7 +55,7 @@ class MedGraphManager(object):
         )
         outputs.append(ner_output)
         df_entity = ner_output.get_table('Entities')
-        if 'MedGenPipe' in pipe_lines:
+        if 'medGen' in pipe_cfg['pipelines'].keys():
             df_links = ner_output.get_table('UmlsLinks')
             # fetch data from MedGen
             medgen_output = self.medgen_pipe.run(
@@ -77,27 +68,8 @@ class MedGraphManager(object):
     def _parse_request(self, request_json: str) -> tuple:
         """
         get info from json
-        :param request_json: json
-        :return:
-        """
-        request_data = json.loads(request_json)
-        missing_args = [x for x in self.REQUIRED_REQUEST_ARGS if x not in request_data.keys()]
-        if missing_args:
-            raise RuntimeError(f'Missing required parameters in request: {missing_args}')
-        disease = request_data.pop(self.DISEASE)
-        # TODO Oweys: get pipelines from json and other keywords
-        """
-            Verstehe ich das richtig: du möchtest, dass ich die pipelines initialisiere?
-            Wird das nicht bereits bei construct_med_graph für alle drei pipelines gemacht?
-            
-        """
 
-        """
-        So koennte ich mir vorstellen, dass ein request JSON von Lorenz Frontend aussehen wird.
-        Die Argumente für die Pipes können schon teilweise einfach in deren run() Methode übergeben werden, wie für
-        die medGen pipe oder müssen noch implementiert werden.
-        
-           example_json = {
+        example_json = {
                 'disease': 'phenylketonurie',
                 'n_articles': 100, # number of articles to be fetched
                 'pipelines': {
@@ -114,22 +86,28 @@ class MedGraphManager(object):
                         'Snomed': True, # flag if SnomedConcepts are extracted
                         'clinicalFeatures': False # flag for clinical Features
                     },
-                    'uniProt': {} # TODO: Sönke muss die noch implementieren
+                    'uniProt': {'run': False}
                 }
             }
-        """
-        # the following statements can be deleted
-        # parse pipelines
-        pipelines = list()
-        if request_data.get('mesh_terms'):
-            pipelines.append(ExtractionPipe('mesh_terms', get_mash_terms))
-        if request_data.get('key_words'):
-            pipelines.append(ExtractionPipe('key_words', get_keywords))
-        if request_data.get('entities'):
-            pipelines.append(ExtractionPipe('entities', self.ner_pipe.run))
-        request_data['extraction_pipe'] = pipelines
 
-        return disease, request_data
+        :param request_json: json
+        :return:
+        """
+        pipe_run_cfg = dict()  # dictionary of pipe info
+        request_data = json.loads(request_json)
+        missing_args = [x for x in self.REQUIRED_REQUEST_ARGS if x not in request_data.keys()]
+        if missing_args:
+            raise RuntimeError(f'Missing required parameters in request: {missing_args}')
+        disease = request_data.pop(self.DISEASE)
+        pipe_run_cfg['n_articles'] = request_data['n_articles'] if 'n_articles' in request_data.keys() else self.cfg['NCBI']['max_articles']
+        pipes = dict()
+        for pipe, v in request_data['pipelines'].items():
+            if v['run']:
+                pipes[pipe] = v
+        pipe_run_cfg['pipelines'] = pipes
+        self._check_pipeline(list(pipes.keys()))
+
+        return disease, pipe_run_cfg
 
     @staticmethod
     def _read_config(cfg_path: str) -> dict:
@@ -140,3 +118,23 @@ class MedGraphManager(object):
         with open(cfg_path, 'r') as fh:
             cfg = json.load(fh)
         return cfg
+
+
+    def _check_pipeline(self, pipes: list):
+        """
+        Method checks if pipelines set to True are not missing any predecessor. Necessary because the pipelines have
+        a specific hierarchy (see `MedGraphManager.PIPE_HIERARCHY`), meaning the `ner` pipe requires the  output of
+        the `pubmed` pipe and so on.
+
+        If any predecessor is missing the method raises a RuntimeError
+
+        :param pipes: list - pipe names of request_json['pipelines'] if pipe['run'] == True
+        """
+        rev_hierarchy = self.PIPE_HIERARCHY[::-1]   # reverse list
+        for i, p in enumerate(rev_hierarchy):
+            if p in pipes and i+1 < len(rev_hierarchy):  # check if pipe is set and if not the last pipe
+                if rev_hierarchy[i+1] not in pipes: # this is the predecessor check
+                    raise RuntimeError(
+                        'Pipe \'{p}\' is set in request but required predecessor pipe \'{pp}\' is missing.'.format(
+                        p=p, pp=rev_hierarchy[i+1]
+                    ))

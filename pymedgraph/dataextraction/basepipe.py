@@ -80,7 +80,7 @@ class NodeTable(object):
                     )
                 )
         else:
-            if df['node_label'].nunique() != 1:
+            if df['node_label'].nunique() > 1:
                 raise RuntimeError('Found unexpected node labels {unq_vals}. Expects: {nl}'.format(
                     unq_vals=df['node_label'].unique(), nl=self.meta["node_label"]
                 ))
