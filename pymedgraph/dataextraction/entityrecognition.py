@@ -67,7 +67,7 @@ class NERPipe(BasePipe):
 
         # text lower and remove possible duplicates but with subset for `pubmedID` and `text` cols
         df_entities['text'] = df_entities['text'].str.lower()
-        df_entities.drop_duplicates(subset=['text', 'pubmedID'], inplace=True)
+        df_entities.drop_duplicates(subset=['text', self.SOURCE_COL], inplace=True)
 
         output.add(NodeTable(
             name='Entities',
@@ -103,4 +103,6 @@ class NERPipe(BasePipe):
         # .. and definition
         df['Definition'] = df['CUI'].apply(lambda x: self.linker.kb.cui_to_entity[x].definition)
         df[self.NODEL_LABEL_COL] = 'UMLS'
+        df[self.SOURCE_COL] = df[self.SOURCE_COL].str.lower()
+        df.drop_duplicates(subset=['CUI', self.SOURCE_COL], inplace=True)
         return df
