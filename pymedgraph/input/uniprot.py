@@ -28,8 +28,9 @@ def get_uniprot_results(genes: list, extra_max_entries: int = 10, columns=None) 
     Method to make request to UniProtKB and return result table as pd.DataFrame.
     """
     if columns is None:
-        columns = 'id,entry name,reviewed,protein names,genes,organism,comment(FUNCTION),database(RefSeq),' \
-                  'go(molecular function),go(biological process),go(cellular component)'
+        columns = 'id,entry name,reviewed,protein names,genes,genes(PREFERRED),organism,comment(FUNCTION),' \
+                  'database(RefSeq),go(molecular function),go(biological process),go(cellular component)'
+
     query = _build_query(genes, organism=True)
     response = requests.get(
         UNIPROT_URL,
