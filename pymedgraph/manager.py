@@ -8,7 +8,7 @@ from pymedgraph.dataextraction import (
     get_keywords,
     get_pubmed_title
 )
-from pymedgraph.dataextraction import StandardPubMedPipe, NERPipe, MedGenPipe
+from pymedgraph.dataextraction import StandardPubMedPipe, NERPipe, MedGenPipe, UniProtPipe
 
 
 
@@ -33,6 +33,7 @@ class MedGraphManager(object):
         self.pubmed_pipe = StandardPubMedPipe()
         self.ner_pipe = NERPipe(nlp_model='en_ner_bc5cdr_md', entity_linker='umls', depends_on='StandardPubMedPipe')
         self.medgen_pipe = MedGenPipe(self.ncbi_fetcher, depends_on='NERPipe')
+        self.uniprot_pipe = UniProtPipe()
 
     def construct_med_graph(self, request_json):
         """ main method """
@@ -65,7 +66,11 @@ class MedGraphManager(object):
                 clinical_features=pipe_cfg['pipelines']['medGen']['clinicalFeatures']
             )
             outputs.append(medgen_output)
-
+        if 'uniProt' in pipe_cfg['pipelines'].keys():
+            genes = medgen_output.get_table('Genes')['gene'].tolist()
+            if genes:
+                uniprot_output = self.uniprot_pipe.run(genes=genes)
+                outputs.append(uniprot_output)
         return disease, outputs
 
     def _parse_request(self, request_json: str) -> tuple:
