@@ -72,23 +72,33 @@ class NodeTable(object):
         for col in req_cols:
             if col not in columns:
                 raise RuntimeError(f'Given pd.DataFrame is missing required column \'{col}\'.')
-        if isinstance(self.meta['node_label'], list):
-            if list(df['node_label'].unique()) != self.meta['node_label']:
-                raise RuntimeError(
-                    'Found unexpected values in df["node_label"] {unq_vals}. Expected is \'{nl}\''.format(
-                        unq_vals=df['node_label'].unique(), nl=self.meta["node_label"]
-                    )
+        for col in df.columns:
+            if ' ' in col:
+                raise ValueError(
+                    f'Column name \'{col}\' in table  \'{self.name}\' contains space, which is not allowed.'
                 )
-        else:
-            if df['node_label'].nunique() > 1:
-                raise RuntimeError('Found unexpected node labels {unq_vals}. Expects: {nl}'.format(
-                    unq_vals=df['node_label'].unique(), nl=self.meta["node_label"]
-                ))
-            if df['node_label'].unique()[0] != self.meta['node_label']:
-                raise RuntimeError('Found NodeLabel \'{fnl}\' is not expected node label: \'{nl}\''.format(
-                    fnl=df['node_label'].unique()[0], nl=self.meta['node_label']
-                ))
-
+            if '-' in col:
+                raise ValueError(
+                    f'Column name \'{col}\' in table  \'{self.name}\' contains a \'-\', which is not allowed.'
+                )
+        if len(df) > 0:
+            if isinstance(self.meta['node_label'], list):
+                if list(df['node_label'].unique()) != self.meta['node_label']:
+                    raise RuntimeError(
+                        'Found unexpected values in df["node_label"] {unq_vals}. Expected is \'{nl}\''.format(
+                            unq_vals=df['node_label'].unique(), nl=self.meta["node_label"]
+                        )
+                    )
+            else:
+                if df['node_label'].nunique() > 1:
+                    # TODO: debug with diabetes
+                    raise RuntimeError('Found unexpected node labels {unq_vals}. Expects: {nl}'.format(
+                        unq_vals=df['node_label'].unique(), nl=self.meta["node_label"]
+                    ))
+                if df['node_label'].unique()[0] != self.meta['node_label']:
+                    raise RuntimeError('Found NodeLabel \'{fnl}\' is not expected node label: \'{nl}\''.format(
+                        fnl=df['node_label'].unique()[0], nl=self.meta['node_label']
+                    ))
 
 class PipeOutput(object):
     """ Class to store pymedgraph.dataextraction.basepipe.NodeTable outputs """
