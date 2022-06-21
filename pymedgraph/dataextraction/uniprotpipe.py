@@ -15,7 +15,7 @@ class UniProtPipe(BasePipe):
     def __init__(self):
         super().__init__(pipe_name='UniProtPipe')
 
-    def _run_pipe(self, genes: list, go=True, mrna=True) -> PipeOutput:
+    def _run_pipe(self, genes: list, go=True, refseq=False) -> PipeOutput:
         output = PipeOutput(self.name)
         # get data from UniProt
         df = get_uniprot_results(genes)
@@ -29,7 +29,7 @@ class UniProtPipe(BasePipe):
             source_col=self.SOURCE_COL,
             node_label='Protein',
             id_attribute='Entry',
-            attribute_cols=['Entry', 'name', 'Organism', 'Protein names', 'Gene names', 'Function [CC]', 'uniProtUrl']
+            attribute_cols=['name', 'Organism', 'ProteinNames', 'GeneNames', 'Function', 'uniProtUrl']
         ))
 
         # get GO (gene ontology) data from df
@@ -43,11 +43,11 @@ class UniProtPipe(BasePipe):
                 source_node_attr='Entry',
                 node_label='GO',
                 id_attribute='GoID',
-                attribute_cols=['GoID', 'Go-type', 'name']
+                attribute_cols=['GoType', 'name']
             ))
 
-        # get mRNA RefSeq data from df
-        if mrna:
+        # get RefSeq data from df
+        if refseq:
             pass
 
         return output
@@ -58,23 +58,31 @@ class UniProtPipe(BasePipe):
             for gene in genes:
                 df.loc[df['Gene names'].str.lower().str.contains(gene.lower()), self.SOURCE_COL] = gene
         else:
-            df = df.rename(columns={'Gene names  (primary )': self.SOURCE_COL})
+            df = df.rename(columns={
+                'Gene names  (primary )': self.SOURCE_COL})
         # shorten protein name -> get everything before first "("
         df['name'] = df['Protein names'].apply(lambda x: x.split('(')[0])
         # add node label
         df[self.NODEL_LABEL_COL] = 'Protein'
         # build uniProt url
         df['uniProtUrl'] = self.UNIPROT_URL + df['Entry']
+        # rename columns to replace spaces in names
+        df = df.rename(columns={
+            'Function [CC]': 'Function',
+            'Protein names': 'ProteinNames',
+            'Gene names': 'GeneNames'
+        })
         # return df with specific columns
         return df[[
             self.SOURCE_COL,
             'Entry',
             self.NODEL_LABEL_COL,
             'name',
-            'Protein names',
-            'Gene names',
+            'ProteinNames',
+            'GeneNames',
             'Organism',
-            'Function [CC]'
+            'Function',
+            'uniProtUrl'
         ]]
 
     def _get_go_df(self, df: pd.DataFrame) -> pd.DataFrame:
@@ -114,8 +122,18 @@ class UniProtPipe(BasePipe):
             self.SOURCE_COL: source_entry,
             'name': go_names,
             'GoID': go_ids,
-            'Go-type': go_types
+            'GoType': go_types
         })
         # add node label
         df[self.NODEL_LABEL_COL] = 'GO'
         return df
+
+    def _get_refseq_df(self, df: pd.DataFrame) -> pd.DataFrame:
+        """
+        Goal of this method is to build a node table df for RefSeq (Reference Sequence) data.
+        This method works very similar to UniProtPipe._get_go_df() but only for the one RefSeq column.
+        """
+        source_entry = list()
+        refseq_id = list()
+        refseq_ids = list()
+        pass
