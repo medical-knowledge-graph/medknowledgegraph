@@ -16,19 +16,18 @@ def get_json():
     if request.method == "POST":
         if request.json:
             request_json = request.json
-            if 'text' in request_json:
-                results = send_keyword(request_json['text'])
+            if 'request_specs' in request_json:
+                results = send_request(request_json['request_specs'])
 
                 return results
-            abort(400, 'JSON data missing text field.')
+            abort(400, 'JSON data missing request_specs field.')
         abort(415)
     abort(405)
     
 
-def send_keyword(keyword):
-    req = json.dumps({'disease': keyword})
+def send_request(req_specs):
     # build tables for nodes and node relations
-    disease, outputs = manager.construct_med_graph(req)
+    disease, outputs = manager.construct_med_graph(req_specs)
     if outputs:
         try:
             # upload tables to neo4j database
