@@ -13,6 +13,9 @@ neo4j = Neo4jBuilder(neo4j_cfg['url'], neo4j_cfg['user'], neo4j_cfg['pw'])
 
 @app.route("/", methods=["POST"])
 def get_json():
+    """ Takes and checks an postrequest from the caller and passes it to the backend.
+
+    """
     if request.method == "POST":
         if request.json:
             request_json = request.json
@@ -26,6 +29,14 @@ def get_json():
     
 
 def send_request(req_specs):
+     """ Creates a MedGraph based on the input of the user.
+
+    :param req_specs:
+        Userinput passed via Postrequest.
+
+    :return msg:
+        A message about failure or success of the building MedGraph.
+    """
     # build tables for nodes and node relations
     disease, outputs = manager.construct_med_graph(req_specs)
     if outputs:
