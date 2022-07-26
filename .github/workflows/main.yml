@@ -28,7 +28,7 @@ jobs:
       - name: Setup SSH passphrase
         env:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-          SSH_PASSPHRASE: sadefw
+          SSH_PASSPHRASE: "sadefw"
           SSH_PRIVATE_KEY: ${{secrets.KARLVM_SSH_KEY}}
         run: |
           ssh-agent -a $SSH_AUTH_SOCK > /dev/null
