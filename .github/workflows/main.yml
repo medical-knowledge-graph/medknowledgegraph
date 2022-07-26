@@ -28,10 +28,9 @@ jobs:
       - name: Setup SSH Keys and known_hosts
         env:
             SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-        run: ssh-agent -a $SSH_AUTH_SOCK > /dev/null
-          
-      - name: Test
-        run: ssh-add - <<< "${{ secrets.KARLVM_SSH_KEY }}"
+        run: | 
+            ssh-agent -a $SSH_AUTH_SOCK > /dev/null
+            ssh-add - <<< "${{ secrets.KARLVM_SSH_KEY }}"
 
       # Open ssh tunnel to the karlvm
       - name: Open tunnel to karlvm
