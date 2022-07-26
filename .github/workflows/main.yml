@@ -27,6 +27,7 @@ jobs:
       
       - name: Setup SSH passphrase
         env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
           SSH_PASSPHRASE: ${{secrets.RSA_KEY_PHRASE}}
           SSH_PRIVATE_KEY: ${{secrets.KARLVM_SSH_KEY}}
         run: |
