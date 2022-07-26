@@ -44,7 +44,7 @@ jobs:
         run: ssh -L ${{ secrets.TUNNEL_TO_KARLVM_IP }} ${{ secrets.KARLVM_USERNAME }} -J ${{ secrets.JUMPHOST_IP }}
 
       # TODO: Push to VM
-      - name: TODO: Push to VM
+      - name: TODO Push to VM
         run: |
               echo Pushing...
               echo to VM...
