@@ -25,12 +25,14 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
       
-      - name: Setup SSH Keys and known_hosts
+      - name: Setup SSH passphrase
         env:
-            SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-        run: | 
-            ssh-agent -a $SSH_AUTH_SOCK > /dev/null
-            ssh-add - <<< "${{ secrets.KARLVM_SSH_KEY }}"
+          SSH_PASSPHRASE: ${{secrets.RSA_KEY_PHRASE}}
+          SSH_PRIVATE_KEY: ${{secrets.KARLVM_SSH_KEY}}
+        run: |
+          ssh-agent -a $SSH_AUTH_SOCK > /dev/null
+          echo 'echo $SSH_PASSPHRASE' > ~/.ssh_askpass && chmod +x ~/.ssh_askpass
+          echo "$SSH_PRIVATE_KEY" | tr -d '\r' | DISPLAY=None SSH_ASKPASS=~/.ssh_askpass ssh-add - >/dev/null
 
       # Open ssh tunnel to the karlvm
       - name: Open tunnel to karlvm
