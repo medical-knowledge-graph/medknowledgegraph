@@ -40,7 +40,7 @@ class MedGraphManager(object):
         self.uniprot_pipe = UniProtPipe()
 
     def construct_med_graph(self, request_json):
-         """ Calls every pipeline and collects data to create the MedGraph.
+        """ Calls every pipeline and collects data to create the MedGraph.
 
         :param request_json:
             Json request passed from frontend.
@@ -136,7 +136,7 @@ class MedGraphManager(object):
 
     @staticmethod
     def _read_config(cfg_path: str) -> dict:
-         """ Read config file.
+        """ Read config file.
 
         :param cfg_path:
             Path to config file.
