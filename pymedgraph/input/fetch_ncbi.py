@@ -11,7 +11,7 @@ class NCBIFetcher(object):
         self.max_articles = max_articles
 
     def get_pubmed_paper(self, term: str, n_articles: int = None) -> list:
-         """ Method returns articles only. Books are not supported yet
+        """ Method returns articles only. Books are not supported yet
 
         :param term:
             Articels fetched based on 'term'.
