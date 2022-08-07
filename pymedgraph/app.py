@@ -14,6 +14,8 @@ neo4j = Neo4jBuilder(neo4j_cfg['url'], neo4j_cfg['user'], neo4j_cfg['pw'])
 
 
 def configure():
+    """ Adds security layer to the API
+    """
     load_dotenv()
     api_tokens = [os.getenv("key"+str(i)) for i in range(1,5)]
     return api_tokens
@@ -22,7 +24,6 @@ def configure():
 @app.route("/", methods=["POST"])
 def get_json():
     """ Takes and checks an postrequest from the caller and passes it to the backend.
-
     """
     if request.method == "POST":
         if request.json:
