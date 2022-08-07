@@ -5,15 +5,21 @@ from neo4j import GraphDatabase
 
 class Neo4jBuilder(object):
     """
-    Using batch upload instead of session + for loop
-    https://towardsdatascience.com/create-a-graph-database-in-neo4j-using-python-4172d40f89c4
+    Neo4JBuilder based on batch upload instead of session + for loop. Source: https://towardsdatascience.com/create-a-graph-database-in-neo4j-using-python-4172d40f89c4
     """
 
     def __init__(self, uri, user, password):
+        """ Initializes Neo4jBuilder and constructs Neo4J driver based on credentials.
+
+        :param uri: URI
+        :param user: Username
+        :param password: Userpassword.
+        """
         self.driver = GraphDatabase.driver(uri, auth=(user, password))
 
     def build_biomed_graph(self, disease: str, pipe_outputs):
-        """
+        """ Building the Biomed Graph
+        
         :param disease: str - name of search term
         :param pipe_outputs: list - contains pymedgraph.dataextraction.basepipe.PipeOutput objects
         """
@@ -23,6 +29,10 @@ class Neo4jBuilder(object):
                 self.upload_nodetable(node_table)
 
     def upload_nodetable(self, node_table):
+        """ Uploads the nodetable into Database.
+
+        :param node_table: Nodetables.
+        """
         # determine if node table contains multiple node labels
         if isinstance(node_table.meta['node_label'], list):
             for node_label in node_table.meta['node_label']:
@@ -74,7 +84,7 @@ class Neo4jBuilder(object):
                 self.insert_data(query, node_table.data)
 
     @staticmethod
-    def filter_node_data(node_table, filter_label=None, drop_duplicates=False) -> pd.DataFrame:
+    def filter_node_data(node_table, filter_label=None, drop_duplicates=False) -> pd.DataFrame: #ToDo Doc
         if filter_label:
             df = node_table.data[node_table.data['node_label'] == filter_label]
         else:
@@ -84,11 +94,11 @@ class Neo4jBuilder(object):
         return df
 
     @staticmethod
-    def get_node_data(node_table):
+    def get_node_data(node_table): #ToDo Doc
         return node_table.data.drop_duplicates(subset=[node_table.meta['id_attribute']])
 
     @staticmethod
-    def _create_node_query(node_table_meta: dict, node_label: str):
+    def _create_node_query(node_table_meta: dict, node_label: str):#ToDo Doc
         """ Build query to upload nodes with attributes """
         # collect columns
         attribute_cols = [node_table_meta['id_attribute']]
@@ -107,7 +117,7 @@ class Neo4jBuilder(object):
         return query
 
     @staticmethod
-    def _create_node_relation_query(node_table_meta: dict, node_label: str, source_node_label: str):
+    def _create_node_relation_query(node_table_meta: dict, node_label: str, source_node_label: str): #ToDo Doc
         """ Build query to upload node relations to source nodes """
         match_query = 'MATCH (a: {A}), (b: {B})'.format(A=source_node_label, B=node_label)
         where_query = 'WHERE a.{a_attr} = row.{a_col} AND b.{b_attr_col} = row.{b_attr_col}'.format(
@@ -138,7 +148,7 @@ class Neo4jBuilder(object):
         self.add_entities(paper)
         self.add_entity_links(entity_links)
 
-    def add_entity_links(self, entity_links: set):
+    def add_entity_links(self, entity_links: set): #ToDo Doc
         """
         :param entity_links: set - contains tuples (e, c, n, d) -> e:entity, c:cui (concept id of link), n:name of
         concept, d:definition of concept.
@@ -164,7 +174,7 @@ class Neo4jBuilder(object):
         resp = self.insert_data(query, df_ent_links[['entity', 'CUI']].drop_duplicates())
         print(resp)
 
-    def add_entities(self, paper: dict, batch_size: int = 1000):
+    def add_entities(self, paper: dict, batch_size: int = 1000): #ToDo Doc
         entity_relations = self._build_entity_relations(paper)
         entity_nodes = self._build_entity_nodes(entity_relations)
 
@@ -187,7 +197,7 @@ class Neo4jBuilder(object):
             query, entity_relations.drop_duplicates(['uri', 'entity_text']).drop('entities', axis=1), batch_size
         )
 
-    def add_paper(self, paper: dict, batch_size: int = 1000):
+    def add_paper(self, paper: dict, batch_size: int = 1000): #ToDo Doc
         paper_uris = list()
         titles = list()
         for paper_id, paper_val in paper.items():
@@ -214,7 +224,7 @@ class Neo4jBuilder(object):
         print(resp)
 
     @staticmethod
-    def _build_entity_links_df(entity_links: set) -> pd.DataFrame:
+    def _build_entity_links_df(entity_links: set) -> pd.DataFrame: #ToDo Doc
         # build DataFrame from list of tuples
         ents = list()
         cuis = list()
@@ -229,7 +239,7 @@ class Neo4jBuilder(object):
 
 
     @staticmethod
-    def _build_entity_relations(result_dict: dict) -> pd.DataFrame:
+    def _build_entity_relations(result_dict: dict) -> pd.DataFrame: #ToDo Doc
         ids = list()
         entities = list()
         for key, value in result_dict.items():
@@ -242,12 +252,12 @@ class Neo4jBuilder(object):
         return df
 
     @staticmethod
-    def _build_entity_nodes(df: pd.DataFrame) -> pd.DataFrame:
+    def _build_entity_nodes(df: pd.DataFrame) -> pd.DataFrame: #ToDo Doc
         # combine different entity labels into one list
         df = df.groupby('entity_text')['entity_label'].unique().apply(list).reset_index()
         return df
 
-    def insert_data(self, query: str, rows: pd.DataFrame, batch_size: int = 2000):
+    def insert_data(self, query: str, rows: pd.DataFrame, batch_size: int = 2000): #ToDo Doc
         """ insert given query with rows batch wise into neo4j """
         total = 0
         batch = 0
@@ -268,7 +278,11 @@ class Neo4jBuilder(object):
         return result
 
     def query(self, query, parameters):
-        """make actual query"""
+        """ Constructs and passes the actual query.
+
+        :param query: Query for session
+        :param parameters: Parameters for session
+        """
         session = None
         response = None
         try:
@@ -282,7 +296,10 @@ class Neo4jBuilder(object):
         return response
 
     def _init_new_neo4j_graph(self, disease: str):
-        """ Method deletes graph and build new node for disease """
+        """ Method deletes graph and build new node for disease
+
+        :param disease: One disesase.
+        """
         delete_query = "MATCH (n) DETACH DELETE n"
         response = self.query(delete_query, None)
         print(response)
@@ -291,6 +308,8 @@ class Neo4jBuilder(object):
         print(response)
 
     def close(self):
+        """ Closes Driver connection when finished.
+        """
         # Don't forget to close the driver connection when you are finished with it
         self.driver.close()
 
