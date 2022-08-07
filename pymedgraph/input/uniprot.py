@@ -6,6 +6,14 @@ UNIPROT_URL = "https://www.uniprot.org/uniprot/"
 
 
 def get_uniprot_entry(query: str, max_entries: int = 10, format_: str = "tab") -> pd.DataFrame:
+    """ Get entries from Uniprot.
+
+    :param query: Query for specific entries.
+    :param max_entries: Number of Entries being fetched (Default=10).
+    :param format_: Format of results.
+    :returns: Returns reults of query in DataFrame format.
+    """
+    
     response = requests.get(
         UNIPROT_URL,
         params={
@@ -26,6 +34,10 @@ def get_uniprot_entry(query: str, max_entries: int = 10, format_: str = "tab") -
 def get_uniprot_results(genes: list, extra_max_entries: int = 10, columns=None) -> pd.DataFrame:
     """
     Method to make request to UniProtKB and return result table as pd.DataFrame.
+    
+    :param genes: list - List of Genes.
+    :param extra_max_entries: int - maximum number of entries.
+    :param columns: Columns of the DataFrame (default=None)
     """
     if columns is None:
         columns = 'id,entry name,reviewed,protein names,genes,genes(PREFERRED),organism,comment(FUNCTION),' \
@@ -50,6 +62,10 @@ def get_uniprot_results(genes: list, extra_max_entries: int = 10, columns=None) 
 def _build_query(genes: list, organism=True, only_reviewd=True):
     """
     This method concatenates all genes in passed list to one query in order to minimize uniprot request.
+    
+    :param genes: list - List of Genes.
+    :param organism: Organism the query should be based on (default = Homo sapiens)
+    :param only_reviewd: check if query was reviewed (default = True)
     """
     query = '(' + ' OR '.join(['gene:' + g for g in genes]) + ')'
     # filter for only reviewed entries
