@@ -109,8 +109,8 @@ class MedGraphManager(object):
                 }
             }
 
-        :param request_json: json
-        :return:
+        :param request_json: Request in a Json-File
+        :return: Returns diseases and requested data
         """
         pipe_run_cfg = dict()  # dictionary of pipe info
         request_data = json.loads(request_json)
