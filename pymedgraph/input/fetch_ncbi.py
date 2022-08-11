@@ -11,7 +11,17 @@ class NCBIFetcher(object):
         self.max_articles = max_articles
 
     def get_pubmed_paper(self, term: str, n_articles: int = None) -> list:
-        """ method returns articles only. Books are not supported yet """
+        """ Method returns articles only. Books are not supported yet
+
+        :param term:
+            Articels fetched based on 'term'.
+
+        :param n_articles:
+            Number of articles which should be fetched.
+
+        :return:
+            Returning PubMed articles.
+        """
         paper_ids = self.search_pubmed(term, n_articles)
         # do request
         handle = Entrez.efetch(db='pubmed', id=paper_ids, retmode='xml')
@@ -20,8 +30,16 @@ class NCBIFetcher(object):
         return records['PubmedArticle']
 
     def search_pubmed(self, term: str, n_articles: int = None) -> list:
-        """
-        method to get UID`s from pubmed for given search term. The UID`s are used to fetch the pubmed records
+        """ Method to get UID`s from pubmed for given search term. The UID`s are used to fetch the pubmed records
+
+        :param term:
+            Articels fetched based on 'term'.
+
+        :param n_articles:
+            Number of articles which should be fetched.
+
+        :return:
+            Returns UIDs.
         """
         # make sure to not fetch more articles then set `max_articles`
         if not n_articles or n_articles > self.max_articles:
@@ -36,8 +54,13 @@ class NCBIFetcher(object):
         return article_ids
 
     def get_medgen_summaries(self, cui:list) -> list:
-        """
-        Get UID´s of MedGen Database and fetch summaries from MedGen
+        """ Get UID´s of MedGen Database and fetch summaries from MedGen
+
+        :param cui:
+            List of CUI IDs.
+
+        :return:
+            Returns summaries of MedGen pipeline.
         """
         uids = self.get_medgen_uids(cui)
         handle = Entrez.esummary(db='medgen', id=','.join(uids), retmode='xml')
@@ -46,9 +69,14 @@ class NCBIFetcher(object):
         return records
 
     def get_medgen_uids(self, cui:list) -> list:
-        """
-        We search UID`s in the NCBI MedGen database with concept IDs (CUI) which we got from the UMLS linkage.
+        """ Searching UID`s in the NCBI MedGen database with concept IDs (CUI) which we got from the UMLS linkage.
         The UID`s will be used to get the MedGen summary for the found concept.
+
+        :param cui:
+            List of CUI IDs.
+
+        :return:
+            Returns UIDs of MedGen pipeline.
         """
         # to make only one request for multiple CUI concepts we join the ids with an OR
         search_term = ' OR '.join(cui)

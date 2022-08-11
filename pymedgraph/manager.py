@@ -20,6 +20,10 @@ class MedGraphManager(object):
     PIPE_HIERARCHY = ['pubmed', 'ner', 'medGen', 'uniProt']
 
     def __init__(self, config_path: str = 'localconfig.json'):
+        """ Inits MedGraphManager based on the all application pipelines.
+
+        :param config_path: Takes credentials for NCBI databases.
+        """
         # read config
         self.cfg = self._read_config(config_path)
         # init fetcher for api requests to pubmed
@@ -36,7 +40,14 @@ class MedGraphManager(object):
         self.uniprot_pipe = UniProtPipe()
 
     def construct_med_graph(self, request_json):
-        """ main method """
+        """ Calls every pipeline and collects data to create the MedGraph.
+
+        :param request_json:
+            Json request passed from frontend.
+
+        :return disease, outputs:
+            Returns collected diseases and other outputs created by the pipelines.
+        """
         outputs = list()
         # get disease and possible filter
         disease, pipe_cfg = self._parse_request(request_json)
@@ -98,8 +109,8 @@ class MedGraphManager(object):
                 }
             }
 
-        :param request_json: json
-        :return:
+        :param request_json: Request in a Json-File
+        :return: Returns diseases and requested data
         """
         pipe_run_cfg = dict()  # dictionary of pipe info
         request_data = json.loads(request_json)
@@ -125,6 +136,14 @@ class MedGraphManager(object):
 
     @staticmethod
     def _read_config(cfg_path: str) -> dict:
+        """ Read config file.
+
+        :param cfg_path:
+            Path to config file.
+
+        :return cfg:
+            Returns the config file.
+        """
         if not os.path.isfile(cfg_path):
             raise AttributeError('Cannot find file under given config path:', cfg_path)
         if not cfg_path.endswith('.json'):
