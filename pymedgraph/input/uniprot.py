@@ -2,7 +2,10 @@ import requests
 from io import StringIO
 import pandas as pd
 
-UNIPROT_URL = "https://www.uniprot.org/uniprot/"
+from pymedgraph.dataextraction.uniprotcolumns import UNIPROT_COLS
+
+
+UNIPROT_URL = 'https://rest.uniprot.org/uniprotkb/search'
 
 
 def get_uniprot_entry(query: str, max_entries: int = 10, format_: str = "tab") -> pd.DataFrame:
@@ -28,8 +31,7 @@ def get_uniprot_results(genes: list, extra_max_entries: int = 10, columns=None) 
     Method to make request to UniProtKB and return result table as pd.DataFrame.
     """
     if columns is None:
-        columns = 'id,entry name,reviewed,protein names,genes,genes(PREFERRED),organism,comment(FUNCTION),' \
-                  'database(RefSeq),go(molecular function),go(biological process),go(cellular component)'
+        columns = ','.join([v['returned_field'] for _, v in UNIPROT_COLS.items()])
 
     query = _build_query(genes, organism=True)
     response = requests.get(
@@ -37,8 +39,8 @@ def get_uniprot_results(genes: list, extra_max_entries: int = 10, columns=None) 
         params={
             "query": query,
             "limit": len(genes) + extra_max_entries,
-            'format': 'tab',
-            'columns': columns
+            'format': 'tsv',
+            'fields': columns
         }
     )
     if response.status_code != 200:
@@ -47,15 +49,15 @@ def get_uniprot_results(genes: list, extra_max_entries: int = 10, columns=None) 
     return pd.read_csv(StringIO(response.text), delimiter='\t')
 
 
-def _build_query(genes: list, organism=True, only_reviewd=True):
+def _build_query(genes: list, organism=True, only_reviewed=True):
     """
     This method concatenates all genes in passed list to one query in order to minimize uniprot request.
     """
     query = '(' + ' OR '.join(['gene:' + g for g in genes]) + ')'
     # filter for only reviewed entries
-    if only_reviewd:
-        query =  query + ' AND reviewed:yes'
+    if only_reviewed:
+        query =  query + ' AND reviewed:true'
     # filter entries for humans only
     if organism:
-        query = query + ' AND organism:"Homo sapiens (Human) [9606]"'
+        query = query + ' AND organism_id:9606'
     return query
