@@ -8,7 +8,7 @@ from pymedgraph.graph.builder import Neo4jBuilder
 
 app = Flask(__name__)
 
-manager = MedGraphManager(config_path='./pymedgraph/localconfig.json')
+manager = MedGraphManager(config_path='localconfig.json')
 neo4j_cfg = manager.cfg.get('Neo4j')
 neo4j = Neo4jBuilder(neo4j_cfg['url'], neo4j_cfg['user'], neo4j_cfg['pw'])
 
@@ -27,12 +27,13 @@ def get_json():
     """
     if request.method == "POST":
         if request.json:
-            request_json = request.json
-            if 'request_specs' and 'token' in request_json:
+            request_json = json.loads(request.json)
+            if ('request_specs' and 'token') in request_json.keys():
                 if not request_json['token'] in tokens:
                     abort(403, 'Token is invalid.')
-                    
+
                 results = send_request(request_json['request_specs'])
+
                 return results
             abort(400, 'JSON data missing request_specs or token field.')
         abort(415)
@@ -64,4 +65,4 @@ def send_request(req_specs):
 
 if __name__ == "__main__":
     tokens = configure()
-    app.run(port=9000, debug = True)
+    app.run(port=8050, debug = True)
