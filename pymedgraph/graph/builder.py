@@ -14,14 +14,16 @@ class Neo4jBuilder(object):
     Source for batch upload: https://towardsdatascience.com/create-a-graph-database-in-neo4j-using-python-4172d40f89c4
     """
 
-    def __init__(self, uri, user, password):
+    def __init__(self, uri, user, password, logger=None):
         """ Initializes Neo4jBuilder and constructs Neo4J driver based on credentials.
 
-        :param uri: URI
-        :param user: Username
-        :param password: Userpassword.
+        :param uri: str - neo4j connection url
+        :param user: str - username to connect to neo4j instance
+        :param password: str - user password to connect to neo4j instance
+        :param logger: logging.logger
         """
         self.driver = GraphDatabase.driver(uri, auth=(user, password))
+        self.logger = logger
 
     def build_biomed_graph(self, disease: str, pipe_outputs):
         """
@@ -32,8 +34,18 @@ class Neo4jBuilder(object):
         """
         self._init_new_neo4j_graph(disease)
         for output in pipe_outputs:
+            if self.logger:
+                self.logger.info('*** Start processing output for pipe \'{p}\'. ***'.format(p=output.pipe))
             for node_table in output.node_tables:
-                self.upload_nodetable(node_table)
+                try:
+                    self.upload_nodetable(node_table)
+                    if self.logger:
+                        self.logger.info('Successfully uploaded node table \'{nt}\'.'.format(nt=node_table.name))
+                except Exception as ex:
+                    if self.logger:
+                        self.logger.error('Failed upload for node table \'{n}\' with {ex}'.format(
+                            n=node_table.name, ex=ex))
+                    raise RuntimeError(ex)
 
     def upload_nodetable(self, node_table):
         """
@@ -203,6 +215,8 @@ class Neo4jBuilder(object):
             result = {"total": total,
                       "batches": batch,
                       "time": time.time() - start}
+            if self.logger:
+                self.logger.info('Successfully uploaded data: {r}'.format(r=result))
             print(result)
 
         return result
@@ -220,20 +234,27 @@ class Neo4jBuilder(object):
             session = self.driver.session()
             response = list(session.run(query, parameters))
         except Exception as ex:
+            if self.logger:
+                self.logger.error('Query failed. qeury: \'{q}\'. {ex}'.format(q=query, ex=ex))
             print('Query failed:', ex)
         finally:
             if session:
                 session.close()
         return response
 
-    def _init_new_neo4j_graph(self, disease: str):
+    def _init_new_neo4j_graph(self, disease: str, delete_existing_graph=True):
         """ Method deletes graph and build new node for disease """
-        delete_query = "MATCH (n) DETACH DELETE n"
-        response = self.query(delete_query, None)
-        print(response)
+        if delete_existing_graph:
+            delete_query = "MATCH (n) DETACH DELETE n"
+            response = self.query(delete_query, None)
+            if self.logger:
+                self.logger.info('Successfully deleted existing graph.')
+            print(response)
         init_query = "CREATE (st:SearchTerm {label: $disease})"
         response = self.query(init_query, {'disease': disease})
         print(response)
+        if self.logger:
+            self.logger.info(f'Successfully initiated graph with search term \'{disease}\'')
 
     @staticmethod
     def get_node_data(node_table):
