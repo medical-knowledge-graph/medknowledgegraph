@@ -132,7 +132,7 @@ class MedGraphManager(object):
         pipe_run_cfg = dict()  # dictionary of pipe info
         # check if no json but dict was passed
         if isinstance(request_json, dict):
-            request_data = request_json
+            request_data = request_json.copy()
         else:
             request_data = json.loads(request_json)
         missing_args = [x for x in self.REQUIRED_REQUEST_ARGS if x not in request_data.keys()]
