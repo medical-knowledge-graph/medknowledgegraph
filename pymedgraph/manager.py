@@ -19,11 +19,14 @@ class MedGraphManager(object):
     REQUIRED_REQUEST_ARGS = [DISEASE, 'pipelines']
     PIPE_HIERARCHY = ['pubmed', 'ner', 'medGen', 'uniProt']
 
-    def __init__(self, config_path: str = 'localconfig.json'):
+    def __init__(self, config_path: str = 'localconfig.json', logger=None):
         """ Inits MedGraphManager based on the all application pipelines.
 
         :param config_path: Takes credentials for NCBI databases.
         """
+        # logger
+        self.logger = logger
+
         # read config
         self.cfg = self._read_config(config_path)
         # init fetcher for api requests to pubmed
@@ -52,11 +55,18 @@ class MedGraphManager(object):
         # get disease and possible filter
         disease, pipe_cfg = self._parse_request(request_json)
 
+        if self.logger:
+            self.logger.info(f'*** START processing pipelines for \'{disease}\' ****')
+            self.logger.info('With pipe config: {cfg}'.format(cfg=pipe_cfg))
+
         # get articles
         pubmed_paper = self.ncbi_fetcher.get_pubmed_paper(
             disease,
             n_articles=pipe_cfg['n_articles'] if 'n_articles' in pipe_cfg.keys() else None
         )
+
+        if self.logger:
+            self.logger.info('Successfully fetched pubmed articles.')
 
         # build dataframe for pubmed data
         pubmed_output = self.pubmed_pipe.run(paper=pubmed_paper, search_term=disease, node_label='Paper')
@@ -65,6 +75,8 @@ class MedGraphManager(object):
         ner_output = self.ner_pipe.run(
             abstracts=pubmed_output.get_table('pubmedPaper'), id_col='pubmedID', abstract_col='abstract'
         )
+        if self.logger:
+            self.logger.info('Successfully extracted entities from abstracts.')
         outputs.append(ner_output)
         df_entity = ner_output.get_table('Entities')
         if 'medGen' in pipe_cfg['pipelines'].keys():
@@ -77,16 +89,21 @@ class MedGraphManager(object):
                 clinical_features=pipe_cfg['pipelines']['medGen']['clinicalFeatures']
             )
             outputs.append(medgen_output)
+            if self.logger:
+                self.logger.info('Successfully extracted medGen data.')
         if 'uniProt' in pipe_cfg['pipelines'].keys():
             genes = medgen_output.get_table('Genes')['gene'].tolist()
             if genes:
                 uniprot_output = self.uniprot_pipe.run(genes=genes)
                 outputs.append(uniprot_output)
+                if self.logger:
+                    self.logger.info('Successfully extracted gene data from UniProt.')
         return disease, outputs
 
     def _parse_request(self, request_json: str) -> tuple:
         """
-        get info from json
+        Method to parse request json to search term and config for the following pipelines.
+        Config is then checked for logical errors
 
         example_json = {
                 'disease': 'phenylketonurie',
@@ -113,9 +130,15 @@ class MedGraphManager(object):
         :return: Returns diseases and requested data
         """
         pipe_run_cfg = dict()  # dictionary of pipe info
-        request_data = json.loads(request_json)
+        # check if no json but dict was passed
+        if isinstance(request_json, dict):
+            request_data = request_json
+        else:
+            request_data = json.loads(request_json)
         missing_args = [x for x in self.REQUIRED_REQUEST_ARGS if x not in request_data.keys()]
         if missing_args:
+            if self.logger:
+                self.logger.error(f'Missing required parameters in request: {missing_args}')
             raise RuntimeError(f'Missing required parameters in request: {missing_args}')
         disease = request_data.pop(self.DISEASE)
         pipe_run_cfg['n_articles'] = request_data['n_articles'] if 'n_articles' in request_data.keys() else self.cfg['NCBI']['max_articles']
@@ -134,8 +157,7 @@ class MedGraphManager(object):
 
         return disease, pipe_run_cfg
 
-    @staticmethod
-    def _read_config(cfg_path: str) -> dict:
+    def _read_config(self, cfg_path: str) -> dict:
         """ Read config file.
 
         :param cfg_path:
@@ -145,8 +167,14 @@ class MedGraphManager(object):
             Returns the config file.
         """
         if not os.path.isfile(cfg_path):
-            raise AttributeError('Cannot find file under given config path:', cfg_path)
+            if self.logger:
+                self.logger.error(f'RuntimeError: Cannot find file under given config path: {cfg_path}')
+            raise RuntimeError('Cannot find file under given config path:', cfg_path)
         if not cfg_path.endswith('.json'):
+            if self.logger:
+                self.logger.error(
+                    f'RuntimeError: Config is expected to be a json file, but the following was given: {cfg_path}'
+                )
             raise RuntimeError('Config is expected to be a json file, but the following was given:', cfg_path)
         with open(cfg_path, 'r') as fh:
             cfg = json.load(fh)
@@ -167,6 +195,9 @@ class MedGraphManager(object):
         for i, p in enumerate(rev_hierarchy):
             if p in pipes and i+1 < len(rev_hierarchy):  # check if pipe is set and if not the last pipe
                 if rev_hierarchy[i+1] not in pipes: # this is the predecessor check
+                    if self.logger:
+                        self.logger.error( 'Pipe \'{p}\' is set in request but required predecessor pipe \'{pp}\' is missing.'.format(
+                        p=p, pp=rev_hierarchy[i+1]))
                     raise RuntimeError(
                         'Pipe \'{p}\' is set in request but required predecessor pipe \'{pp}\' is missing.'.format(
                         p=p, pp=rev_hierarchy[i+1]
