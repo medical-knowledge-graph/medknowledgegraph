@@ -5,7 +5,13 @@ from neo4j import GraphDatabase
 
 class Neo4jBuilder(object):
     """
-    Neo4JBuilder based on batch upload instead of session + for loop. Source: https://towardsdatascience.com/create-a-graph-database-in-neo4j-using-python-4172d40f89c4
+    Class is used with the method `Neo4jBuilder.build_biomed_graph` to upload a new subgraph to the initiated neo4j
+    instance. It requires the pymedgraph.dataextraction.basepipe.PipeOutput objects, to extract all necessary information
+    for the upload from the data tables.
+
+    We use a batch upload with the "UNWIND" functionality instead of a session and for loops.
+
+    Source for batch upload: https://towardsdatascience.com/create-a-graph-database-in-neo4j-using-python-4172d40f89c4
     """
 
     def __init__(self, uri, user, password):
@@ -18,8 +24,9 @@ class Neo4jBuilder(object):
         self.driver = GraphDatabase.driver(uri, auth=(user, password))
 
     def build_biomed_graph(self, disease: str, pipe_outputs):
-        """ Building the Biomed Graph
-        
+        """
+        Wrapper method to build new graph for disease and pipe output tables.
+
         :param disease: str - name of search term
         :param pipe_outputs: list - contains pymedgraph.dataextraction.basepipe.PipeOutput objects
         """
@@ -29,9 +36,20 @@ class Neo4jBuilder(object):
                 self.upload_nodetable(node_table)
 
     def upload_nodetable(self, node_table):
-        """ Uploads the nodetable into Database.
+        """
+        Method uploads the nodetable into a neo4j instance.
 
-        :param node_table: Nodetables.
+        Although the method handles different types of node tables and passes different parameters to sub functions,
+        the pattern for the data upload is always the same:
+
+        Nodes
+        1. Building a query string for the nodes with `Neo4jBuilder._create_node_query`
+        2. Passing the query to upload data `Neo4jBuilder.insert_data`
+        Node Relations
+        3. Building a query string for the node relations with `Neo4jBuilder._create_node_relation_query`
+        4. Passing the query to upload data `Neo4jBuilder.insert_data`
+
+        :param node_table: pymedgraph.dataextraction.basepipe.NodeTable
         """
         # determine if node table contains multiple node labels
         if isinstance(node_table.meta['node_label'], list):
@@ -43,9 +61,7 @@ class Neo4jBuilder(object):
                     query,
                     self.filter_node_data(node_table, filter_label=node_label, drop_duplicates=True)
                 )
-                # TODO: ugly -.-
                 if isinstance(node_table.meta['source_node'], list):
-
                     for source_node in node_table.meta['source_node']:
                         # get query for relations
                         query = self._create_node_relation_query(node_table.meta, node_label, source_node)
@@ -69,14 +85,12 @@ class Neo4jBuilder(object):
             # do upload
             self.insert_data(query, self.filter_node_data(node_table, drop_duplicates=True))
             if isinstance(node_table.meta['source_node'], list):
-                print('correct')
                 for source_node in node_table.meta['source_node']:
                     # get query for relations
                     query = self._create_node_relation_query(node_table.meta, node_table.meta['node_label'], source_node)
                     # do upload
                     self.insert_data(query, self.filter_node_data(node_table))
             else:
-                print('wrong')
                 query = self._create_node_relation_query(
                     node_table.meta, node_table.meta['node_label'], node_table.meta['source_node']
                 )
@@ -84,7 +98,15 @@ class Neo4jBuilder(object):
                 self.insert_data(query, node_table.data)
 
     @staticmethod
-    def filter_node_data(node_table, filter_label=None, drop_duplicates=False) -> pd.DataFrame: #ToDo Doc
+    def filter_node_data(node_table, filter_label=None, drop_duplicates=False) -> pd.DataFrame:
+        """
+        Method is used to either filter the node table for a given `node_label`, for instance "Gene" or
+        to drop duplicates in table by a given attribute subset, or both.
+
+        :param node_table: pymedgraph.dataextraction.basepipe.NodeTable
+        :param filter_label: str - node lable, by which the data is selected
+        :param drop_duplicates: bool
+        """
         if filter_label:
             df = node_table.data[node_table.data['node_label'] == filter_label]
         else:
@@ -93,13 +115,26 @@ class Neo4jBuilder(object):
             df = df.drop_duplicates(subset=[node_table.meta['id_attribute']])
         return df
 
-    @staticmethod
-    def get_node_data(node_table): #ToDo Doc
-        return node_table.data.drop_duplicates(subset=[node_table.meta['id_attribute']])
+
 
     @staticmethod
-    def _create_node_query(node_table_meta: dict, node_label: str):#ToDo Doc
-        """ Build query to upload nodes with attributes """
+    def _create_node_query(node_table_meta: dict, node_label: str) -> str:
+        """
+        Build query to upload nodes with attributes.
+        Method prepares query, which will be complemented with data via a pd.DataFrame. The query defines variables
+        for the node label and it`s attributes. The variables will be replaced by the given data.
+
+        To do a batch upload the query contains the `UNWIND` statement.
+
+        *** NOTE ***
+            We us `MERGE` instead of `CREATE` in the Cypher query to avoid duplicates!
+            This way the node is only going to be created, if it does not already exist`s.
+        ** END NOTE ***
+
+        :param node_table_meta: dict - (pymedgraph.dataextraction.basepipe.NodeTable.meta) meta information about table,
+         such as attribute columns and id
+        :param node_label: str - Label of node, which will be created. E.g. "Gene" or "Paper" or "DISEASE"
+        """
         # collect columns
         attribute_cols = [node_table_meta['id_attribute']]
         if node_table_meta['attribute_cols']:
@@ -111,154 +146,49 @@ class Neo4jBuilder(object):
             if i + 1 != len(attribute_cols):
                 node_attr_string += ', '
         # build node string
-        node_string = 'CREATE (n: {n} {{{attr}}})'.format(n=node_label, attr=node_attr_string)
+        node_string = 'MERGE (n: {n} {{{attr}}})'.format(n=node_label, attr=node_attr_string)
         # build final query
         query = 'UNWIND $rows AS row ' + node_string + ' RETURN count(*) as total'
         return query
 
     @staticmethod
-    def _create_node_relation_query(node_table_meta: dict, node_label: str, source_node_label: str): #ToDo Doc
-        """ Build query to upload node relations to source nodes """
+    def _create_node_relation_query(node_table_meta: dict, node_label: str, source_node_label: str):
+        """
+        Build query to upload node relations to source node
+
+        The nodes are selected for the relation linkage by their id attribute, which is stated in the `node_table_meta`
+        dictionary.
+
+        e.g.
+            In this case the DISEASE node is the source node and UMLS is the current node which was uploaded before.
+
+            DISEASE-[CONTAINS]->UMLS
+
+            DISEASE ({text: phenylketonuria, ..}) -[:CONTAINS]-> UMLS ({CUI: C0031485, ..})
+
+        :param node_table_meta: dict - (pymedgraph.dataextraction.basepipe.NodeTable.meta) meta information about table,
+         such as attribute columns and id. This method uses `source_node_attr` & `source_column` to determine the
+         relations.
+        :param node_label: str - label of node, which was created
+        :param source_node_label: str - label of source node, which is already in the database
+         """
         match_query = 'MATCH (a: {A}), (b: {B})'.format(A=source_node_label, B=node_label)
         where_query = 'WHERE a.{a_attr} = row.{a_col} AND b.{b_attr_col} = row.{b_attr_col}'.format(
             a_attr=node_table_meta['source_node_attr'], a_col=node_table_meta['source_column'],
             b_attr_col=node_table_meta['id_attribute']
         )
         query = 'UNWIND $rows AS row ' + match_query + ' ' + where_query + \
-                ' CREATE (a)-[:CONTAINS]->(b) RETURN count(*) as total'
+                ' MERGE (a)-[:CONTAINS]->(b) RETURN count(*) as total'
         return query
 
-    def build_graph(self, disease: str, paper: dict, entity_links: set):
+    def insert_data(self, query: str, rows: pd.DataFrame, batch_size: int = 2000):
         """
-        Method to create new graph on neo4j instance.
-        First the method deletes current nodes + relations on instance and creates single node with search term -> disease.
-        Second, paper nodes + relations to disease are created.
-        Then entities found in abstracts are created (nodes + relations to paper)
-        Lastly, the links of entities to another knowledge base are created (nodes + relations to entities)
+        Wrapper method to call `Neo4jBuilder.query()` in batches to upload data to neo4j instance.
 
-        :param disease: str - term of pubmed search
-        :param paper: dict - contains pubmed fetch result + info extraction. looks similar to
-        {k: {title: '', entities: [(e-text, e-label)]}} where k: paper id, title: paper title, entities: list of tuples
-        with entity text and label.
-        :param entity_links: set - contains tuples (e, c, n, d) -> e:entity, c:cui (concept id of link), n:name of
-        concept, d:definition of concept.
+        :param query: str - query must contain UNWIND statement and
+        :param rows: pd.DataFrame - contains either nodes + attributes or node relations
+        :param batch_size: int - size of batch to be uploaded per session
         """
-        self._init_new_neo4j_graph(disease)
-        self.add_paper(paper)
-        self.add_entities(paper)
-        self.add_entity_links(entity_links)
-
-    def add_entity_links(self, entity_links: set): #ToDo Doc
-        """
-        :param entity_links: set - contains tuples (e, c, n, d) -> e:entity, c:cui (concept id of link), n:name of
-        concept, d:definition of concept.
-        """
-        df_ent_links = self._build_entity_links_df(entity_links)
-
-        # add entity link nodes
-        query = '''
-                    UNWIND $rows AS row
-                    CREATE (go:GO {cui: row.CUI, name: row.Name, definition: row.Definition})
-                    RETURN count(*) as total
-                '''
-        self.insert_data(query, df_ent_links.drop('entity', axis=1).drop_duplicates())
-
-        # add relations to entities
-        query = '''
-                    UNWIND $rows AS row
-                    MATCH (e:Entity), (go:GO)
-                    WHERE e.text = row.entity AND go.cui = row.CUI
-                    CREATE (e)-[:CONTAINS]->(go)
-                    RETURN count(*) as total
-                '''
-        resp = self.insert_data(query, df_ent_links[['entity', 'CUI']].drop_duplicates())
-        print(resp)
-
-    def add_entities(self, paper: dict, batch_size: int = 1000): #ToDo Doc
-        entity_relations = self._build_entity_relations(paper)
-        entity_nodes = self._build_entity_nodes(entity_relations)
-
-        # add nodes
-        query = '''
-                    UNWIND $rows AS row
-                    CREATE (e:Entity {text: row.entity_text, labels: row.entity_label})
-                    RETURN count(*) as total
-                '''
-        self.insert_data(query, entity_nodes, batch_size)
-        # add relations
-        query = '''
-                    UNWIND $rows AS row
-                    MATCH (p:Paper), (e:Entity)
-                    WHERE p.uri = row.uri AND e.text = row.entity_text
-                    CREATE (p)-[:CONTAINS]->(e)
-                    RETURN count(*) as total
-                '''
-        self.insert_data(
-            query, entity_relations.drop_duplicates(['uri', 'entity_text']).drop('entities', axis=1), batch_size
-        )
-
-    def add_paper(self, paper: dict, batch_size: int = 1000): #ToDo Doc
-        paper_uris = list()
-        titles = list()
-        for paper_id, paper_val in paper.items():
-            paper_uris.append(paper_id)
-            titles.append(paper_val['title'])
-        df = pd.DataFrame({'paper_uri': paper_uris, 'title': titles})
-
-        # add paper nodes
-        query = '''
-                    UNWIND $rows AS row
-                    CREATE (p:Paper {uri: row.paper_uri, title: row.title})
-                    RETURN count(*) as total
-                '''
-
-        resp = self.insert_data(query, df, batch_size)
-        print(resp)
-        # add relations to disease
-        query = '''
-                    MATCH (d:Disease), (p:Paper)
-                    CREATE (d)-[:FOUND_IN]->(p)
-                    RETURN count(*) as total
-                '''
-        resp = self.query(query, None)
-        print(resp)
-
-    @staticmethod
-    def _build_entity_links_df(entity_links: set) -> pd.DataFrame: #ToDo Doc
-        # build DataFrame from list of tuples
-        ents = list()
-        cuis = list()
-        names = list()
-        defs = list()
-        for link in entity_links:
-            ents.append(link[0])
-            cuis.append(link[1])
-            names.append(link[2])
-            defs.append(link[3])
-        return pd.DataFrame({'entity': ents, 'CUI': cuis, 'Name': names, 'Definition': defs})
-
-
-    @staticmethod
-    def _build_entity_relations(result_dict: dict) -> pd.DataFrame: #ToDo Doc
-        ids = list()
-        entities = list()
-        for key, value in result_dict.items():
-            ids.append(key)
-            entities.append(value['entities'])
-        df = pd.DataFrame({'uri': ids, 'entities': entities}).explode('entities').dropna()
-        # split up tuple (entity-text, entity-label)
-        df['entity_text'], df['entity_label'] = zip(*df['entities'])
-
-        return df
-
-    @staticmethod
-    def _build_entity_nodes(df: pd.DataFrame) -> pd.DataFrame: #ToDo Doc
-        # combine different entity labels into one list
-        df = df.groupby('entity_text')['entity_label'].unique().apply(list).reset_index()
-        return df
-
-    def insert_data(self, query: str, rows: pd.DataFrame, batch_size: int = 2000): #ToDo Doc
-        """ insert given query with rows batch wise into neo4j """
         total = 0
         batch = 0
         start = time.time()
@@ -278,10 +208,11 @@ class Neo4jBuilder(object):
         return result
 
     def query(self, query, parameters):
-        """ Constructs and passes the actual query.
+        """
+        Method to passes query and data to neo4j driver session.
 
-        :param query: Query for session
-        :param parameters: Parameters for session
+        :param query: str
+        :param parameters: dict
         """
         session = None
         response = None
@@ -296,10 +227,7 @@ class Neo4jBuilder(object):
         return response
 
     def _init_new_neo4j_graph(self, disease: str):
-        """ Method deletes graph and build new node for disease
-
-        :param disease: One disesase.
-        """
+        """ Method deletes graph and build new node for disease """
         delete_query = "MATCH (n) DETACH DELETE n"
         response = self.query(delete_query, None)
         print(response)
@@ -307,10 +235,10 @@ class Neo4jBuilder(object):
         response = self.query(init_query, {'disease': disease})
         print(response)
 
+    @staticmethod
+    def get_node_data(node_table):
+        return node_table.data.drop_duplicates(subset=[node_table.meta['id_attribute']])
+
     def close(self):
-        """ Closes Driver connection when finished.
-        """
         # Don't forget to close the driver connection when you are finished with it
         self.driver.close()
-
-
