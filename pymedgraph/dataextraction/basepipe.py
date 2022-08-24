@@ -111,7 +111,7 @@ class PipeOutput(object):
             raise TypeError('Can only add objects of type NodeTable.')
         self.node_tables.append(node_table)
 
-    def get_table(self, name: str) -> pd.DataFrame:
+    def get_table(self, name: str) -> pd.DataFrame or str:
         for table in self.node_tables:
             if table.name == name:
                 return table.data

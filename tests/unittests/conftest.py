@@ -1,5 +1,29 @@
 import pytest
 import json
+import pandas as pd
+
+
+@pytest.fixture
+def nodetable_df():
+    """
+        NodeTable(
+            name='pubmedPaper',
+            df=df,
+            source_node='SearchTerm',
+            source_node_attr='label',
+            source_col=self.SOURCE_COL,
+            node_label=node_label,
+            id_attribute='pubmedID',
+            attribute_cols=self._attribute_columns
+
+            |source |node label | node attribute 1  | ... |node attribute X  |
+            |---    |---        |---                | ... |---               |
+    """
+    return pd.DataFrame({
+        'source': ['C0031485', 'C0268465'],
+        'node_label': ['Gene', 'Gene'],
+        'gene': ['PAH', 'QDPR']
+    })
 
 
 @pytest.fixture
