@@ -30,7 +30,7 @@ class NodeTable(object):
             'attribute_cols': attribute_cols
         }
         self._check_df(df)
-        self.data = df
+        self.data = df.fillna('')
 
     @property
     def meta(self):
@@ -61,6 +61,9 @@ class NodeTable(object):
         self._meta = m
 
     def _check_df(self, df: pd.DataFrame):
+        """
+        Method checks for meta + data logic as well as neo4j conform format
+        """
         # check if dataframe
         if not isinstance(df, pd.DataFrame):
             raise TypeError(f'Output of pipe \'{self.name}\' must be of type pd.DataFrame.')
