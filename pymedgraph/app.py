@@ -1,5 +1,6 @@
 import json
 from flask import Flask, request, abort
+from flask_cors import CORS, cross_origin
 from dotenv import load_dotenv
 import os
 
@@ -43,13 +44,14 @@ def configure():
 
 
 @app.route("/", methods=["POST"])
+@cross_origin()
 def get_json():
     """ Takes and checks an postrequest from the caller and passes it to the backend.
     """
     logger.info('Got request.')
     if request.method == "POST":
         if request.json:
-            request_json = json.loads(request.json)
+            request_json = request.json
             if ('request_specs' and 'token') in request_json.keys():
                 if not request_json['token'] in tokens:
                     logger.error('403: Invalid token.')
@@ -77,11 +79,11 @@ def send_request(req_specs):
     """
     logger.info(f'*** STARTING to process request \'{req_specs}\'. ***')
     # build tables for nodes and node relations
-    disease, outputs = manager.construct_med_graph(req_specs)
+    disease, outputs, delete_graph = manager.construct_med_graph(req_specs)
     if outputs:
         try:
             # upload tables to neo4j database
-            neo4j.build_biomed_graph(disease, outputs)
+            neo4j.build_biomed_graph(disease, outputs, delete_graph)
             logger.info(f'Successfully uploaded graph with search term \'{disease}\' to neo4j.')
             msg =  'success'
         except RuntimeError:
