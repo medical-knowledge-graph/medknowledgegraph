@@ -98,7 +98,7 @@ class MedGraphManager(object):
                 outputs.append(uniprot_output)
                 if self.logger:
                     self.logger.info('Successfully extracted gene data from UniProt.')
-        return disease, outputs
+        return disease, outputs, pipe_cfg['delete_existing_graph']
 
     def _parse_request(self, request_json: str) -> tuple:
         """
@@ -140,8 +140,10 @@ class MedGraphManager(object):
             if self.logger:
                 self.logger.error(f'Missing required parameters in request: {missing_args}')
             raise RuntimeError(f'Missing required parameters in request: {missing_args}')
+        # extract info from request dict
         disease = request_data.pop(self.DISEASE)
         pipe_run_cfg['n_articles'] = request_data['n_articles'] if 'n_articles' in request_data.keys() else self.cfg['NCBI']['max_articles']
+        pipe_run_cfg['delete_existing_graph'] = request_data['delete_graph'] if 'delete_graph' in request_data.keys() else False
         pipes = dict()
         for pipe, v in request_data['pipelines'].items():
             if v['run']:
@@ -155,7 +157,7 @@ class MedGraphManager(object):
         pipe_run_cfg['pipelines'] = pipes
         self._check_pipeline(list(pipes.keys()))
 
-        return disease, pipe_run_cfg
+        return disease.lower(), pipe_run_cfg
 
     def _read_config(self, cfg_path: str) -> dict:
         """ Read config file.
