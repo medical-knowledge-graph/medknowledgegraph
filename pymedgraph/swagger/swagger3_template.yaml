@@ -1,0 +1,141 @@
+openapi: 3.0.0
+info:
+  title: pymedgraph Openapi 3.0
+  description: pymedgraph API to build a biomedical knowledge graph with neo4j
+  version: 0.1.0
+  contact:
+    email: soeren.spiegel@studium.uni-hamburg.de
+tags:
+  - name: pymedgraph
+    description: Building a KnowledgeGraph from med literature and other source on neo4j instance
+  - name: neo4j
+    description: Neo4j Queries on existing Graph
+paths:
+  # Fetching Data from public sources and building neo4j Graph
+  /buildGraph:
+    post:
+      tags:
+        - pymedgraph
+      summary: Building KnowledgeGraph
+      description: Request to fetch data from Pubmed and other sources to build a Subgraph in neo4j instance
+      operationId: buildGraph
+      requestBody:
+        description: Start processing of data fetch, info gathering and graph build
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BuildGraphReq'
+        required: true
+      responses:
+        '200':
+          description: Successfull operation
+  /searchTerms:
+    post:
+      tags:
+        - neo4j
+      summary: Get SearchTerm nodes from neo4j
+      description: Send query to neo4j instance and return labels of SearchTerm nodes
+      requestBody:
+        description: Send query to neo4j instance and return labels of SearchTerm nodes
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchTermReq'
+        required: true
+      responses:
+        '200':
+          description: Successfull operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchTermsResp'
+components:
+  schemas:
+    BuildGraphReq:
+      required:
+        - token
+        - request_specs
+      type: object
+      properties:
+        request_specs:
+          $ref: '#/components/schemas/BuildGraphReqSpecs'
+        token:
+          type: string
+          example: XT0K3NX
+    BuildGraphReqSpecs:
+      required:
+        - pubmed
+        - ner
+        - medGen
+        - uniProt
+      properties:
+        pubmed:
+          $ref: '#/components/schemas/Pubmed'
+        ner:
+          $ref: '#/components/schemas/NER'
+        medGen:
+          $ref: '#/components/schemas/MedGen'
+        uniProt:
+          $ref: '#/components/schemas/UniProt'
+    Pubmed:
+      required:
+        - run
+      type: object
+      properties:
+        run:
+          type: boolean
+          example: true
+        meshTerms:
+          type: boolean
+          example: false
+    NER:
+      required:
+        - run
+      type: object
+      properties:
+        run:
+          type: boolean
+          example: true
+        entityLinks:
+          type: boolean
+          example: true
+    MedGen:
+      required:
+        - run
+      type: object
+      properties:
+        run:
+          type: boolean
+          example: true
+        Snomed:
+          type: boolean
+          example: true
+        clinicalFeatures:
+          type: boolean
+          example: false
+    UniProt:
+      required:
+        - run
+      type: object
+      properties:
+        run:
+          type: boolean
+          example: true
+    SearchTermReq:
+      required:
+        - token
+      type: object
+      properties:
+        token:
+          type: string
+          example: XT0K3NX
+    SearchTermsResp:
+      type: object
+      properties:
+        searchTerms:
+          type: array
+          items:
+            type: string
+          example:
+             - hepatitis
+             - hyperthyroidism
