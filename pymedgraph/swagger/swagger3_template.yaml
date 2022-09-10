@@ -7,17 +7,20 @@ info:
     email: soeren.spiegel@studium.uni-hamburg.de
 tags:
   - name: pymedgraph
-    description: Building a KnowledgeGraph from med literature and other source on neo4j instance
+    description: >-
+      Building a KnowledgeGraph from med literature and other source on neo4j
+      instance
   - name: neo4j
     description: Neo4j Queries on existing Graph
 paths:
-  # Fetching Data from public sources and building neo4j Graph
   /buildGraph:
     post:
       tags:
         - pymedgraph
       summary: Building KnowledgeGraph
-      description: Request to fetch data from Pubmed and other sources to build a Subgraph in neo4j instance
+      description: >-
+        Request to fetch data from Pubmed and other sources to build a Subgraph
+        in neo4j instance
       operationId: buildGraph
       requestBody:
         description: Start processing of data fetch, info gathering and graph build
@@ -137,5 +140,5 @@ components:
           items:
             type: string
           example:
-             - hepatitis
-             - hyperthyroidism
+            - hepatitis
+            - hyperthyroidism
