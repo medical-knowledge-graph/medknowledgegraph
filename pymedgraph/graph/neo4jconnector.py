@@ -249,7 +249,7 @@ class Neo4jConnector(object):
             if self.logger:
                 self.logger.info('Successfully deleted existing graph.')
             print(response)
-        init_query = "CREATE (st:SearchTerm {label: $disease})"  #TODO: MATCH
+        init_query = "MERGE (st:SearchTerm {label: $disease})"
         response = self.query(init_query, {'disease': disease})
         print(response)
         if self.logger:
