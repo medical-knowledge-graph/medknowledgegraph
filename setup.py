@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='pymedgraph',
-    version='0.0.1',
+    version='0.1.0',
     description='Build graph from med abstracts and more',
     packages=[
         'pymedgraph',
