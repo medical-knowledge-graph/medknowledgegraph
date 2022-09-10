@@ -3,7 +3,7 @@ import pandas as pd
 from neo4j import GraphDatabase
 
 
-class Neo4jBuilder(object):
+class Neo4jConnector(object):
     """
     Class is used with the method `Neo4jBuilder.build_biomed_graph` to upload a new subgraph to the initiated neo4j
     instance. It requires the pymedgraph.dataextraction.basepipe.PipeOutput objects, to extract all necessary information
@@ -25,14 +25,15 @@ class Neo4jBuilder(object):
         self.driver = GraphDatabase.driver(uri, auth=(user, password))
         self.logger = logger
 
-    def build_biomed_graph(self, disease: str, pipe_outputs):
+    def build_biomed_graph(self, disease: str, pipe_outputs, delete_graph: bool = False):
         """
         Wrapper method to build new graph for disease and pipe output tables.
 
         :param disease: str - name of search term
         :param pipe_outputs: list - contains pymedgraph.dataextraction.basepipe.PipeOutput objects
+        :param delete_graph: bool - flag if existing graph shall be deleted or not
         """
-        self._init_new_neo4j_graph(disease)
+        self._init_new_neo4j_graph(disease, delete_graph)
         for output in pipe_outputs:
             if self.logger:
                 self.logger.info('*** Start processing output for pipe \'{p}\'. ***'.format(p=output.pipe))
@@ -126,8 +127,6 @@ class Neo4jBuilder(object):
         if drop_duplicates:
             df = df.drop_duplicates(subset=[node_table.meta['id_attribute']])
         return df
-
-
 
     @staticmethod
     def _create_node_query(node_table_meta: dict, node_label: str) -> str:
@@ -250,11 +249,20 @@ class Neo4jBuilder(object):
             if self.logger:
                 self.logger.info('Successfully deleted existing graph.')
             print(response)
-        init_query = "CREATE (st:SearchTerm {label: $disease})"
+        init_query = "CREATE (st:SearchTerm {label: $disease})"  #TODO: MATCH
         response = self.query(init_query, {'disease': disease})
         print(response)
         if self.logger:
             self.logger.info(f'Successfully initiated graph with search term \'{disease}\'')
+
+    def get_search_terms(self) -> list:
+        """ Method to get existing Nodes with SearchTerm label in neo4j instance """
+        query_string = "MATCH (s:SearchTerm) RETURN s"
+        result = self.query(query_string, None)
+        search_terms =  [r.get('s').get('label') for r in result]
+        if self.logger:
+            self.logger.info(f'Neo4j Request with query \'{query_string}\' and response: {search_terms}')
+        return search_terms
 
     @staticmethod
     def get_node_data(node_table):
