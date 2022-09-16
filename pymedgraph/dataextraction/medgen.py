@@ -7,7 +7,21 @@ from pymedgraph.dataextraction.basepipe import BasePipe, PipeOutput, NodeTable
 
 class MedGenPipe(BasePipe):
     """
-    Class to make request to NCBI MedGen database based on CUI
+    Class to make request to NCBI MedGen database based on CUI id`s.
+    The idea is to look for genes in the most found UMLS concepts in abstracts for a given search term.
+    Therefore, we collect the ID´s of the most prominent UMLS concepts -> CUI`s and make a request to the MedGen
+    database, which returns a ton of useful information. Since the database returns an XML we first have to parse it.
+    For this we use the `pymedgraph.dataextraction.parser.parse_medgen()` method.
+    We are always looking for genes, but the pipeline can also search for Snomed concepts and clinical features if the
+    flag is set.
+
+    As every other `pymedgraph.dataextraction.basepipe.BaspePipe` subclass the main method is the
+    `MedGenPipe._run_pipe()` method, which will be executed from the manager for an API request and returns an
+    `pymedgraph.dataextraction.basepipe.PipeOutput` object containing NodeTables.
+
+    Clinical Features: A record about a condition may include a section describing the features of the condition.
+    These data are provided from either the Human Phenotype Ontology (HPO) or OMIM. The first five features are
+    displayed, with an option to view the full list. https://www.ncbi.nlm.nih.gov/medgen/docs/help/#clinical-features
     """
     def __init__(self, ncbi_fetcher: NCBIFetcher,depends_on=None):
         super().__init__('MedGenPipe', depends_on=depends_on)
@@ -25,8 +39,23 @@ class MedGenPipe(BasePipe):
         self._fetcher = f
 
     def _run_pipe(self, df_entities: pd.DataFrame, df_links: pd.DataFrame,
-                  snomed=False, clinical_features=False) -> PipeOutput:
+                  snomed: bool = False, clinical_features:bool = False) -> PipeOutput:
+        """
+        This method is the main class method and proceeds in the following steps:
+        1. collects most frequent UMLS concept IDS (-> CUI`s) from `df_entities` and `df_links`
+        2. Makes a MedGen database request with the CUI´s
+        3. parse XML response, with `pymedgraph.dataextraction.parser.parse_medgen()`
+        4. Builds `pymedgraph.dataextraction.basepipe.NodeTable` objects for:
+            - Genes: ALWAYS
+            - SnomedConcept: only if `snomed` flag is True
+            - Clinical Features: only if `clinical_features` flag is True
 
+        :param df_entities: pd.DataFrame - contains entities, used to select n most mentioned entities
+        :param df_links: pd.DataFrame - umls concepts, used to select concepts CUI for MedGen fetch
+        :param snomed: bool - flag, if SnomedConcepts shall be extracted from MedGen response
+        :param clinical_features: bool - flag, if ClinicalFeatures shall be extracted from MedGen response
+        :return: `pymedgraph.dataextraction.basepipe.PipeOutput` object
+        """
         output = PipeOutput(self.name)
 
         # select IDs
@@ -75,7 +104,7 @@ class MedGenPipe(BasePipe):
 
         return output
 
-    def _select_cui(self, df_entity: pd.DataFrame, df_links: pd.DataFrame, n_=30, cui_n=3) -> json.dumps:
+    def _select_cui(self, df_entity: pd.DataFrame, df_links: pd.DataFrame, n_=15, cui_n=4) -> list:
         """
         Filter for n CUI ids. Filtering is done by selecting most popular entities found in paper and then selecting
         `cui_n` UMLS concepts to request MedGen.
@@ -83,7 +112,8 @@ class MedGenPipe(BasePipe):
         :param df_entity: pd.DataFrame - contains entities, used to select n most mentioned entities
         :param df_links: pd.DataFrame - umls concepts, used to select concepts CUI for MedGen fetch
         :param n_: int - number of top n most entities, which will be selected for CUI selection
-        :param cui_n: int - of n_ entities cui_n are selected for actual MedGen request
+        :param cui_n: int - of `n_` entities cui_n are selected for actual MedGen request
+        :returns: list - containing CUI´s to make MedGen request
         """
         cuis = list()
         # select n most found entities
@@ -91,18 +121,22 @@ class MedGenPipe(BasePipe):
         # get n cui ids for each entity
         for ent in entities:
             links = df_links[
-                        (df_links[self.SOURCE_COL] == ent) & (df_links['kb_score'] > 0.9)
+                        (df_links[self.SOURCE_COL] == ent) & (df_links['kb_score'] > 0.85)
                         ].sort_values(by='kb_score', ascending=False)['CUI'].values.tolist()[:cui_n]
             if links:
                 cuis += links
-
         # save list as json
-        cuis_dict = {'cuis':list(set(cuis))}
-        cuis_json = json.dumps(cuis_dict)
-
-        return cuis_json
+        # cuis_dict = {'cuis':list(set(cuis))}
+        #cuis_json = json.dumps(cuis_dict)
+        return list(set(cuis))
 
     def _build_gene_df(self, summaries: dict) -> pd.DataFrame:
+        """
+        This method builds a Gene pd.DataFrame with MedGen `summaries` parsed response.
+        :param summaries: dict - returned by `pymedgraph.dataextraction.parser.parse_medgen()` containing summary of
+        MedGen responses.
+        :return: pd.DataFrame - containing Gene names and CUI
+        """
         data = list()
         for k, summary in summaries.items():
             for gene in summary['genes']:
@@ -112,6 +146,13 @@ class MedGenPipe(BasePipe):
         return df
 
     def _build_snomed_df(self, summaries: dict) -> pd.DataFrame:
+        """
+        This method builds a Snomed pd.DataFrame from MedGen summary in `summaries`.
+        Snomed CT is a core clinical healthcare terminology.
+        :param summaries: dict - returned by `pymedgraph.dataextraction.parser.parse_medgen()` containing summary of
+        MedGen responses.
+        :return: pd.DataFrame - containing Snomed CT concept values, such das concept id and text
+        """
         data = list()
         for k, summary in summaries.items():
             for id_, concept in summary['snomed'].items():
@@ -121,6 +162,13 @@ class MedGenPipe(BasePipe):
         return df
 
     def _build_clinical_features_df(self, summaries: dict) -> pd.DataFrame:
+        """
+        This method builds a ClinicalFeature pd.DataFrame from each MedGen summary in `summaries`.
+        Clinical Features are describing features of the condition, such as Headaches
+        :param summaries: dict - returned by `pymedgraph.dataextraction.parser.parse_medgen()` containing summary of
+        MedGen responses.
+        :return: pd.DataFrame - containing CUI and clinical feature values, such as type, name and definition
+        """
         data = list()
         for k, summary in summaries.items():
             for cui, feature in summary['clinical_features'].items():
