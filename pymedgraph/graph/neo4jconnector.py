@@ -264,6 +264,57 @@ class Neo4jConnector(object):
             self.logger.info(f'Neo4j Request with query \'{query_string}\' and response: {search_terms}')
         return search_terms
 
+    def get_intersection(self, search_terms: str, level: str) -> tuple:
+        """
+        Method to make send query to neo4j instance, which calculates the node intersection between the given search
+        terms on the given level.
+        :param search_terms: str - comma seperated list of terms e.g. -> 'hepatitis,follicular lymphoma,...'
+        :param level: str - name of knowledge graph node label e.g. -> 'Gene'
+        :return: tuple - (fail or success, results as json or error message)
+        """
+        graph_level_limit = {
+            'DISEASE': 2,
+            'CHEMICAL': 2,
+            'UMLS': 3,
+            'Gene': '',
+            'Protein': '',
+            'SnomedConcept': '',
+            'ClinicalFeature': '',
+            'GO': ''
+        }
+        search_terms_in_db = self.get_search_terms()
+        req_search_terms = search_terms.split(',')
+        if any([t for t in req_search_terms if t not in search_terms_in_db]):
+            msg = 'Passed search term \'{term}\', which is not in Knowledge Graph.'.format(
+                term=[t for t in req_search_terms if t not in search_terms_in_db]
+            )
+            if self.logger:
+                self.logger.error(msg)
+            return 'fail', msg
+        if level not in graph_level_limit.keys():
+            msg = f'Passed unknown knwoledge graph label: {level}. Abort.'
+            if self.logger:
+                self.logger.error(msg)
+            return 'fail', msg
+
+        cypher_query = """
+        WITH {st} AS list
+        UNWIND list AS ele1
+        MATCH (s:SearchTerm {{label: ele1}})-[*{n}]->(n:{la})
+        WITH collect(DISTINCT n) AS r1, ele1 AS ele1, list AS list
+        UNWIND list AS ele2
+        MATCH (s:SearchTerm {{label: ele2}})-[*{n}]->(n:{la})
+        WITH collect(DISTINCT n) AS r2, ele1 AS ele1, ele2 AS ele2, r1 AS r1
+        RETURN ele1, ele2, size(apoc.coll.intersection(r1, r2))
+        """.format(st=req_search_terms, n=graph_level_limit[level], la=level)
+        # send query to neo4j KnowledgeGraph
+        result = self.query(cypher_query, None)
+        if not result:
+            return 'fail', 'Cypher got no results..'
+        df = pd.DataFrame([dict(d) for d in result])
+        df.columns = ['e1', 'e2', level]
+        return 'success', df.to_json(orient="records")
+
     @staticmethod
     def get_node_data(node_table):
         return node_table.data.drop_duplicates(subset=[node_table.meta['id_attribute']])
