@@ -9,7 +9,7 @@ from pymedgraph.dataextraction import (
     get_pubmed_title
 )
 from pymedgraph.dataextraction import StandardPubMedPipe, NERPipe, MedGenPipe, UniProtPipe
-
+from pymedgraph.utils import store_medgen_genes_set
 
 
 class MedGraphManager(object):
@@ -39,8 +39,16 @@ class MedGraphManager(object):
         # init pipelines
         self.pubmed_pipe = StandardPubMedPipe()
         self.ner_pipe = NERPipe(nlp_model='en_ner_bc5cdr_md', entity_linker='umls', depends_on='StandardPubMedPipe')
-        self.medgen_pipe = MedGenPipe(self.ncbi_fetcher, depends_on='NERPipe')
-        self.uniprot_pipe = UniProtPipe()
+        if self.cfg['pipes'].get('medgen'):
+            medgen_cfg = self.cfg['pipes']['medgen']
+            if 'medgen_list_path' in medgen_cfg.keys():
+                medgen_path = medgen_cfg['medgen_list_path']
+                if not os.path.isfile(medgen_path):
+                    store_medgen_genes_set(medgen_path, None)
+            self.medgen_pipe = MedGenPipe(self.ncbi_fetcher, depends_on='NERPipe', **medgen_cfg)
+        else:
+            self.medgen_pipe = MedGenPipe(self.ncbi_fetcher, depends_on='NERPipe')
+        self.uniprot_pipe = UniProtPipe(depends_on='MedGenPipe')
 
     def construct_med_graph(self, request_json):
         """ Calls every pipeline and collects data to create the MedGraph.
@@ -69,8 +77,15 @@ class MedGraphManager(object):
             self.logger.info('Successfully fetched pubmed articles.')
 
         # build dataframe for pubmed data
-        pubmed_output = self.pubmed_pipe.run(paper=pubmed_paper, search_term=disease, node_label='Paper')
+        pubmed_output = self.pubmed_pipe.run(
+            paper=pubmed_paper,
+            search_term=disease,
+            node_label='Paper',
+            mesh_terms=pipe_cfg['pubmed']['meshTerms']
+        )
         outputs.append(pubmed_output)
+        if self.logger:
+            self.logger.info('Successfully extracted paper from response.')
         # extract named entities and entity links to UMLS knowledgebase
         ner_output = self.ner_pipe.run(
             abstracts=pubmed_output.get_table('pubmedPaper'), id_col='pubmedID', abstract_col='abstract'
@@ -152,6 +167,9 @@ class MedGraphManager(object):
                     for k in ['Snomed', 'clinicalFeatures']:
                         if k not in v:
                             v[k] = False
+                if pipe == 'pubmed':
+                    if 'meshTerms' not in v:
+                        v['meshTerms'] = False
                 # add pipe value to dict
                 pipes[pipe] = v
         pipe_run_cfg['pipelines'] = pipes
@@ -159,28 +177,31 @@ class MedGraphManager(object):
 
         return disease.lower(), pipe_run_cfg
 
-    def _read_config(self, cfg_path: str) -> dict:
-        """ Read config file.
+    def _read_config(self, cfg_path: str or dict) -> dict:
+        """ Reads config file.
 
         :param cfg_path:
-            Path to config file.
+            Path to config file or config dict
 
         :return cfg:
-            Returns the config file.
+            Returns the config dictionary.
         """
-        if not os.path.isfile(cfg_path):
-            if self.logger:
-                self.logger.error(f'RuntimeError: Cannot find file under given config path: {cfg_path}')
-            raise RuntimeError('Cannot find file under given config path:', cfg_path)
-        if not cfg_path.endswith('.json'):
-            if self.logger:
-                self.logger.error(
-                    f'RuntimeError: Config is expected to be a json file, but the following was given: {cfg_path}'
-                )
-            raise RuntimeError('Config is expected to be a json file, but the following was given:', cfg_path)
-        with open(cfg_path, 'r') as fh:
-            cfg = json.load(fh)
-        return cfg
+        if isinstance(cfg_path, dict):
+            return cfg_path
+        else:
+            if not os.path.isfile(cfg_path):
+                if self.logger:
+                    self.logger.error(f'RuntimeError: Cannot find file under given config path: {cfg_path}')
+                raise RuntimeError('Cannot find file under given config path:', cfg_path)
+            if not cfg_path.endswith('.json'):
+                if self.logger:
+                    self.logger.error(
+                        f'RuntimeError: Config is expected to be a json file, but the following was given: {cfg_path}'
+                    )
+                raise RuntimeError('Config is expected to be a json file, but the following was given:', cfg_path)
+            with open(cfg_path, 'r') as fh:
+                cfg = json.load(fh)
+            return cfg
 
 
     def _check_pipeline(self, pipes: list):

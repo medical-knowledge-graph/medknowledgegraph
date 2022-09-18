@@ -1,10 +1,22 @@
 {
   "API": {
-    "port": 5050
+    "port": 8050
   },
   "NCBI": {
     "email": "soeren.spiegel@studium.uni-hamburg.de",
     "tool_name": "MedKnowledgeGraph",
     "max_articles": 500
+  },
+  "Neo4j": {
+    "url": "",
+    "user": "",
+    "pw": ""
+  },
+  "pipes": {
+    "medgen": {
+      "medgen_list": true,
+      "medgen_list_path": "/home/spiegel/projects/biomedgraph/notebooks/medgen_Genes.txt",
+      "max_concepts": 100
+    }
   }
 }

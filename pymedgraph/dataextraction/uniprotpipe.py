@@ -6,24 +6,26 @@ from pymedgraph.input.uniprot import get_uniprot_entry, get_uniprot_results
 
 class UniProtPipe(BasePipe):
     """
-    This class extracts data from the bioinformatic protein database `UniProt`
+    This class extracts data from the bioinformatic protein database `UniProt` based on passed genes.
+    The pipe will always return proteins and if the correct flag is set, we extract gene ontologies (GO), too.
 
     ** IMPORTANT **
     Make sure that column names fit the `Returned Fields` of uniprot: https://www.uniprot.org/help/return_fields
     If you want to make changes go to pymedgraph.dataextraction.uniprotcolumns and adapt UNIPROT_COLS
     **
-
-    |source |node label  | $attr$Name  | $attr$UniProtID    |
-    |GenXY  | ProteinXY  | geneName     | xyIDxy            |
     """
 
     UNIPROT_URL = 'https://www.uniprot.org/uniprotkb/'
     GO_TYPES = ['molecular function', 'biological process', 'cellular component']
 
-    def __init__(self):
-        super().__init__(pipe_name='UniProtPipe')
+    def __init__(self, depends_on=None):
+        super().__init__(pipe_name='UniProtPipe', depends_on=depends_on)
 
     def _run_pipe(self, genes: list, go=True, refseq=False) -> PipeOutput:
+        """
+        This method makes a request to the UniProt database, based on the passed list of genes. From the response
+        we can extract proteins and if the flag is set, gene ontologies (GO) as well.
+        """
         output = PipeOutput(self.name)
         # get data from UniProt
         df = get_uniprot_results(genes)
@@ -61,6 +63,9 @@ class UniProtPipe(BasePipe):
         return output
 
     def _get_protein_df(self, df: pd.DataFrame, genes: list) -> pd.DataFrame:
+        """
+        Method builds a pd.DataFrame with protein infos, based on UniProt response
+        """
         # add source column
         if set(genes) != set(df[UNIPROT_COLS['gene_primary']['label']].values):
             for gene in genes:
@@ -118,13 +123,17 @@ class UniProtPipe(BasePipe):
         # run through lines in df
         for go_type in self.GO_TYPES:
             col = f'Gene Ontology ({go_type})'
-            for entry, go_list in zip(df['Entry'], df[col]):
-                for go in go_list.split(';'):
-                    go_split = go.split('[')
-                    go_names.append(go_split[0].strip())
-                    go_ids.append(go_split[1][:-1])
-                    source_entry.append(entry)
-                    go_types.append(go_type)
+            for entry, go_list in zip(df['Entry'], df[col].fillna('')):
+                try:
+                    if go_list:
+                        for go in go_list.split(';'):
+                            go_split = go.split('[')
+                            go_names.append(go_split[0].strip())
+                            go_ids.append(go_split[1][:-1])
+                            source_entry.append(entry)
+                            go_types.append(go_type)
+                except:
+                    print('WARNING: unable to split GO list with value: ', go_list)
         # build df
         df = pd.DataFrame({
             self.SOURCE_COL: source_entry,

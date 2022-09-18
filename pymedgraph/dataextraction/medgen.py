@@ -5,6 +5,7 @@ from pymedgraph.input.fetch_ncbi import NCBIFetcher
 from pymedgraph.dataextraction.parser import parse_medgen
 from pymedgraph.dataextraction.basepipe import BasePipe, PipeOutput, NodeTable
 
+
 class MedGenPipe(BasePipe):
     """
     Class to make request to NCBI MedGen database based on CUI id`s.
@@ -23,10 +24,38 @@ class MedGenPipe(BasePipe):
     These data are provided from either the Human Phenotype Ontology (HPO) or OMIM. The first five features are
     displayed, with an option to view the full list. https://www.ncbi.nlm.nih.gov/medgen/docs/help/#clinical-features
     """
-    def __init__(self, ncbi_fetcher: NCBIFetcher,depends_on=None):
+    def __init__(self, ncbi_fetcher: NCBIFetcher, depends_on=None, **kwargs):
+        """
+        Init class.
+        kwargs can contain `medgen_list`, `medgen_list_path` and `max_concepts`.
+        If `medgen_list` flag is True, then the class tries to read an existing file, which contains a list of
+        CUI id´s. This ID`s are coming from MedGen Gene relationship table and states only concept Id`s with gene
+        information. The list is transformed to a set to have quicker look ups and the class sets
+        `MedGenPipe.use_medgen_set` to True. This has influence on the `MedGenPipe._select_cui()` method.
+        """
         super().__init__('MedGenPipe', depends_on=depends_on)
 
         self.fetcher = ncbi_fetcher
+
+        # parse kwargs
+        if 'medgen_list' in kwargs:
+            if kwargs['medgen_list']:
+                # look for file
+                if 'medgen_list_path' in kwargs:
+                    try:
+                        self.medgen_gene_set = self._read_medgen_list(kwargs['medgen_list_path'])
+                        self.use_medgen_set = True
+                    except:
+                        print(f'WARNING: cannot read medgen gene list from {kwargs["medgen_list_path"]}')
+                        self.use_medgen_set = False
+                else:
+                    self.use_medgen_set = False
+        else:
+            self.use_medgen_set = False
+        if 'max_concepts' in kwargs:
+            self.max_concepts = kwargs['max_concepts']
+        else:
+            self.max_concepts = 50
 
     @property
     def fetcher(self):
@@ -115,19 +144,22 @@ class MedGenPipe(BasePipe):
         :param cui_n: int - of `n_` entities cui_n are selected for actual MedGen request
         :returns: list - containing CUI´s to make MedGen request
         """
-        cuis = list()
-        # select n most found entities
-        entities = df_entity[df_entity[self.NODEL_LABEL_COL] == 'DISEASE']['text'].value_counts()[:n_].index.tolist()
-        # get n cui ids for each entity
-        for ent in entities:
-            links = df_links[
-                        (df_links[self.SOURCE_COL] == ent) & (df_links['kb_score'] > 0.85)
-                        ].sort_values(by='kb_score', ascending=False)['CUI'].values.tolist()[:cui_n]
-            if links:
-                cuis += links
-        # save list as json
-        # cuis_dict = {'cuis':list(set(cuis))}
-        #cuis_json = json.dumps(cuis_dict)
+
+        if self.use_medgen_set:
+            cui_links = df_links[df_links['kb_score']>0.85]['CUI'].unique()
+            cuis = [i for i in cui_links if i in self.medgen_gene_set]
+        else:
+            cuis = list()
+            # select n most found entities
+            entities = df_entity[df_entity[self.NODEL_LABEL_COL] == 'DISEASE']['text'].value_counts()[:n_].index.tolist()
+            # get n cui ids for each entity
+            for ent in entities:
+                links = df_links[
+                            (df_links[self.SOURCE_COL] == ent) & (df_links['kb_score'] > 0.85)
+                            ].sort_values(by='kb_score', ascending=False)['CUI'].values.tolist()[:cui_n]
+                if links:
+                    cuis += links
+
         return list(set(cuis))
 
     def _build_gene_df(self, summaries: dict) -> pd.DataFrame:
@@ -178,3 +210,10 @@ class MedGenPipe(BasePipe):
             columns=[self.SOURCE_COL, 'CUI', 'type', 'name', 'definition'])
         df[self.NODEL_LABEL_COL] = 'ClinicalFeature'
         return df
+
+    @staticmethod
+    def _read_medgen_list(file_path: str) -> set:
+        # read file and transform list to set
+        with open(file_path, 'r') as fh:
+            medgen_genes = set([line[:-1] for line in fh.readlines()])
+        return medgen_genes
