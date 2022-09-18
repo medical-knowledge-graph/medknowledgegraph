@@ -80,7 +80,7 @@ class NCBIFetcher(object):
         """
         # to make only one request for multiple CUI concepts we join the ids with an OR
         search_term = ' OR '.join(cui)
-        handle = Entrez.esearch(db='medgen', term=search_term)
+        handle = Entrez.esearch(db='medgen', term=search_term, retmax=len(cui))
         record = Entrez.read(handle)
         handle.close()
         return record['IdList']
