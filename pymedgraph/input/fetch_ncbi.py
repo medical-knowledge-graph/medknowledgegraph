@@ -3,9 +3,14 @@ from Bio import Entrez
 
 class NCBIFetcher(object):
     """
-    Class to make request to NCBI databases via Entrez API
+    Class to make request to NCBI databases via Entrez API.
+    This class is a wrapper for the `Bio.Entrez` package https://biopython.org/docs/1.75/api/Bio.Entrez.html and is
+    mostly used to transform request parameters to a suitable format.
+
+    See Entrez documentation: https://www.ncbi.nlm.nih.gov/books/NBK25501/
     """
     def __init__(self, email, tool_name, max_articles=10):
+        """ The NCBI association asks to set an email contact and tool name for the requests."""
         Entrez.email = email
         Entrez.tool = tool_name
         self.max_articles = max_articles

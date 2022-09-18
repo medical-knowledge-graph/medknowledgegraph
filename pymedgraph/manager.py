@@ -2,12 +2,6 @@ import os
 import json
 
 from pymedgraph.input.fetch_ncbi import NCBIFetcher
-from pymedgraph.dataextraction import (
-    get_mash_terms,
-    get_pubmed_id,
-    get_keywords,
-    get_pubmed_title
-)
 from pymedgraph.dataextraction import StandardPubMedPipe, NERPipe, MedGenPipe, UniProtPipe
 from pymedgraph.utils import store_medgen_genes_set
 

@@ -13,7 +13,7 @@ class NERPipe(BasePipe):
 
     Pipeline to extract named entities from abstracts with scispacy model.
 
-    If entity linker for UMLS is set, found entities are linked to knowledge base
+    If entity linker for UMLS is set, found entities are linked to the UMLS knowledge base
 
     """
     def __init__(self, nlp_model: str, entity_linker: str = None, depends_on=None):
@@ -33,6 +33,10 @@ class NERPipe(BasePipe):
     def _run_pipe(self, abstracts: pd.DataFrame, id_col: str, abstract_col: str) -> PipeOutput:
         """
         Extract NamedEntities and Linkage to UMLS Knowledgebase
+        Therefore we throw all abstracts with their id into the scispacy model pipeline and store the named entities,
+        with label DISEASE or CHEMICAL. But this pipeline does not stop there, if the scispacy linker to the UMLS
+        knowledge base is set. We then find the kmean nearest neighbour of entity to UMLS concepts.
+        Named entities and concepts are stored in `pymedgraph.dataextraction.basepipe.NodeTable` objects.
         """
         output = PipeOutput(self.name)
 
@@ -96,6 +100,10 @@ class NERPipe(BasePipe):
         return output
 
     def _build_entity_links_df(self, entity_links: set) -> pd.DataFrame:
+        """
+        Method builds pd.DataFrame from a set of entity links.
+        The set contains tuples (t, c, s) t=entity text, c=CUI of entity link, s=score of entity link
+        """
         # build df
         df = pd.DataFrame(entity_links, columns=[self.SOURCE_COL, 'CUI', 'kb_score'])
         # add umls concept name

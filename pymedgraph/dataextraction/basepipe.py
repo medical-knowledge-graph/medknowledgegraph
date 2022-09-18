@@ -4,20 +4,34 @@ from pymedgraph.dataextraction.parser import get_pubmed_id, get_pubmed_title, ge
 
 class NodeTable(object):
     """
-    Class is used to store a node data table as pd.DataFrame with meta data info, such as node label of source etc
+    Class is used to store a node data table as pd.DataFrame with meta data info, such as node label of source etc,
+    see __init__.
+
+    The meta data is later on used by the `pymedgraph.Neo4jConnector` to upload the nodes into the neo4j database
+    correctly, meaning being able to find the correct relations to already uploaded node tables.
+
+    The `NodeTable.df` has the following patter:
+        |source |node label | node attribute 1  | ... |node attribute X  |
+        |---    |---        |---                | ... |---               |
+
+    To ensure there are no syntax or logic errors between the dataframe and the metadata, which could break the upload
+    to the neo4j instance, the dataframe is checked during the object initiation.
     """
     def __init__(self, name, df, source_node, source_node_attr, source_col, node_label, id_attribute, attribute_cols):
         """
+        This init requires a ton of parameters to build a useful meta data dictionary, used to upload the table into
+        neo4j.
+        The pd.DataFrame will be checked for logic or syntax errors.
 
         :param name: str - name of node table. Should be used as identifier, if you are creating a table for gene nodes
         you want to name the NodeTable instance `genes`.
         :param df: pd.DataFrame - contains info about the node. See above
-        :param source_node: str or list
-        :param source_node_attr: str
-        :param source_col: str
-        :param node_label: str or list
-        :param id_attribute: str
-        :param attribute_cols: list
+        :param source_node: str or list - nodel labels of the source relationship
+        :param source_node_attr: str - attribute label by which the source node can be identified
+        :param source_col: str - column label for df, in which the source relationship of node is stored
+        :param node_label: str or list - labels fo node e.g. 'Gene'
+        :param id_attribute: str - the node can be identified by this attribute
+        :param attribute_cols: list - contains all node attribute columns of df
         """
         self.name = name
         self.meta = {
@@ -94,7 +108,6 @@ class NodeTable(object):
                     )
             else:
                 if df['node_label'].nunique() > 1:
-                    # TODO: debug with diabetes
                     raise RuntimeError('Found unexpected node labels {unq_vals}. Expects: {nl}'.format(
                         unq_vals=df['node_label'].unique(), nl=self.meta["node_label"]
                     ))

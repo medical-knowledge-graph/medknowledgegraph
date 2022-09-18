@@ -67,7 +67,7 @@ def _build_query(genes: list, organism=True, only_reviewed=True):
     
     :param genes: list - List of Genes.
     :param organism: Organism the query should be based on (default = Homo sapiens)
-    :param only_reviewd: check if query was reviewed (default = True)
+    :param only_reviewed: check if query was reviewed (default = True)
     """
     query = '(' + ' OR '.join(['gene:' + g for g in genes]) + ')'
     # filter for only reviewed entries

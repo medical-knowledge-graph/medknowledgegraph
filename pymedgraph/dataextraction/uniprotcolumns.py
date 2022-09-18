@@ -1,6 +1,3 @@
-import requests
-from bs4 import BeautifulSoup
-
 """
 Names of columns and returned fields for uniport requests.
 Might be updated in the future
