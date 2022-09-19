@@ -276,11 +276,11 @@ class Neo4jConnector(object):
             'DISEASE': 2,
             'CHEMICAL': 2,
             'UMLS': 3,
-            'Gene': '',
-            'Protein': '',
-            'SnomedConcept': '',
-            'ClinicalFeature': '',
-            'GO': ''
+            'Gene': 4,
+            'Protein': 5,
+            'SnomedConcept': 4,
+            'ClinicalFeature': 4,
+            'GO': 6
         }
         search_terms_in_db = self.get_search_terms()
         req_search_terms = search_terms.split(',')

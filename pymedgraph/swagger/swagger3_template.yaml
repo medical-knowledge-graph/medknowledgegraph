@@ -32,19 +32,60 @@ paths:
       responses:
         '200':
           description: Successfull operation
-  /searchTerms:
-    post:
+  /searchTerms/{token}:
+    get:
       tags:
         - neo4j
       summary: Get SearchTerm nodes from neo4j
       description: Send query to neo4j instance and return labels of SearchTerm nodes
-      requestBody:
-        description: Send query to neo4j instance and return labels of SearchTerm nodes
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SearchTermReq'
-        required: true
+      parameters:
+        - in: "path"
+          name: token
+          schema:
+            type: string
+          required: true
+          description: Authentication token
+      #requestBody:
+      #  description: Send query to neo4j instance and return labels of SearchTerm nodes
+      #  content:
+      #    application/json:
+      #      schema:
+      #        $ref: '#/components/schemas/SearchTermReq'
+      #  required: true
+      responses:
+        '200':
+          description: Successfull operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchTermsResp'
+  /intersections/{searchTerms}{level}{token}:
+    get:
+      tags:
+        - neo4j
+      summary: Get intersection count of search terms per level
+      description: Send a query to neo4j knowledge graph and calculates intersection between given parameters
+      parameters:
+        - in: "path"
+          name: searchTerms
+          schema:
+            type: string
+          example: phenylketonuria,epilepsy
+          required: true
+          description: search terms for which the intersection shall be calculated
+        - in: "path"
+          name: level
+          schema:
+            type: string
+          example: UMLS
+          description: level of knowledge graph, for instance UMLS
+          required: true
+        - in: "path"
+          name: token
+          schema:
+            type: string
+          required: true
+          description: Authentication token
       responses:
         '200':
           description: Successfull operation
@@ -66,6 +107,27 @@ components:
           type: string
           example: XT0K3NX
     BuildGraphReqSpecs:
+      required:
+        - disease
+        - n_articles
+        - pipelines
+      properties:
+        disease:
+          type: string
+          example: Phenylketonuria
+        n_articles:
+          type: integer
+          example: 50
+        delete_graph:
+          type: boolean
+          example: True
+          default: False
+        delete_graph_pw:
+          type: string
+          example: pw123
+        pipelines:
+          $ref: '#/components/schemas/PipelineSpecs'
+    PipelineSpecs:
       required:
         - pubmed
         - ner

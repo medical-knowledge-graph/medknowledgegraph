@@ -7,16 +7,24 @@ from pymedgraph.utils import store_medgen_genes_set
 
 
 class MedGraphManager(object):
-    """ Class to manage requests and graph build"""
+    """
+    Class to manage api requests and the data fetching and processing to build data tables for a neo4j Knowledge Graph.
+    The data processing are organised in pipelines, which are initialized by the initiation of this class.
+    The api request is handled by the method `MedGraphManager.construct_med_graph()`.
+    """
 
     DISEASE = 'disease'
     REQUIRED_REQUEST_ARGS = [DISEASE, 'pipelines']
     PIPE_HIERARCHY = ['pubmed', 'ner', 'medGen', 'uniProt']
 
     def __init__(self, config_path: str = 'localconfig.json', logger=None):
-        """ Inits MedGraphManager based on the all application pipelines.
+        """
+        Inits MedGraphManager based and pipelines based on the passed config.
+        It is necessary to init the pipelines now, because of the great loading time of the NERPipe, meaning for one
+        the scispacy model but more importantly the `EntityLinker` which requires several minutes.
 
-        :param config_path: Takes credentials for NCBI databases.
+        :param config_path: Takes credentials for NCBI databases and MedGenPipe specs
+        :param logger: logger
         """
         # logger
         self.logger = logger
@@ -45,12 +53,23 @@ class MedGraphManager(object):
         self.uniprot_pipe = UniProtPipe(depends_on='MedGenPipe')
 
     def construct_med_graph(self, request_json):
-        """ Calls every pipeline and collects data to create the MedGraph.
+        """
+        Main method of the class, which is called by the api. The calls every pipeline accordingly to the received
+        request specifications and collects the output.
+        The processing is as follows:
+        1. fetch data from Pubmed
+        2. StandardPubMedPipe: get data from basic info from response
+        3. NERPipe: extract CHEMICAl & DISEASE entities from abstracts and searches for UMLS concepts of DISEASE entities
+        4. MedGenPipe: collects promising UMLS Concept ID`s (CUI) and makes MedGen request plus extracts data
+        5. UniProtPipe: makes request based on genes from MedGenPipe and extracts Proteins + GenOntologies
+
+        The output of each pipe is a `pymedgraph.dataextraction.basepipe.PipeOutput` object containing n
+        `pymedgrapg.dataextraction.basepipe.NodeTable`. These objects are used for the neo4j upload.
 
         :param request_json:
             Json request passed from frontend.
 
-        :return disease, outputs:
+        :return: disease, outputs, delete_graph_flag:
             Returns collected diseases and other outputs created by the pipelines.
         """
         outputs = list()
@@ -75,7 +94,7 @@ class MedGraphManager(object):
             paper=pubmed_paper,
             search_term=disease,
             node_label='Paper',
-            mesh_terms=pipe_cfg['pubmed']['meshTerms']
+            mesh_terms=pipe_cfg['pipelines']['pubmed']['meshTerms']
         )
         outputs.append(pubmed_output)
         if self.logger:
