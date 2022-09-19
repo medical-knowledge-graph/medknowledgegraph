@@ -20,8 +20,10 @@ API documentation and usage guide.
 4. Usage
 
 ## 1. install
+*** IMPORTANT *** 
+In order to use the Neo4jConnector you have to enter the necessary neo4j credentials + url into the `pymedgraph/localconfig.json`
+*** END ***
 Create a new Environment with <b>Python 3.7</b>, which is required for the scispacy model.
-
 Then clone the repository. 
 Activate your python 3.7 environment and change your directory to the package folder
 ````shell
