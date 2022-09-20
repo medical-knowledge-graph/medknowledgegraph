@@ -72,7 +72,7 @@ def build_graph():
     return msg
 
 
-@app.route("/searchTerms",  methods=["POST"])
+@app.route("/searchTerms",  methods=["GET"])
 @cross_origin()
 def get_searchterms():
     """
@@ -80,9 +80,41 @@ def get_searchterms():
     """
     logger.info('Got \'searchTerms\' request.')
     # check if request is OK
-    req_json = _get_request_json(request, ['token'])
+    _check_get_args(request.args, ['token'])
     search_terms = neo4j.get_search_terms()
     return json.dumps({'searchTerms': search_terms})
+
+
+@app.route("/intersection", methods=["GET"])
+@cross_origin()
+def get_intersections():
+    """
+    API returns json with intersection count of nodes for given parameters (search terms and KG level)
+    """
+    logger.info('Got \'intersection\' request.')
+    _check_get_args(request.args, ['searchTerms', 'level', 'token'])
+    result = neo4j.get_intersection(request.args.get('searchTerms'), request.args.get('level'))
+    return json.dumps(result)
+
+def _check_get_args(request_args, required_args: list = None):
+    """
+    Method checks get request for parameters
+    :param request_args: werkzeug.datastructures.MultiDict
+    :param required_args: list
+    """
+    if required_args is None:
+        required_args = ['token']
+    if 'token' not in required_args:
+        required_args.append('token')
+    missing_args = [a for a in required_args if a not in request_args]
+    if len(missing_args) > 0:
+        logger.error('400: Missing parameter:', missing_args)
+        abort(400, 'Missing parameter:', missing_args)
+    token = request.args.get('token')
+    if not token in tokens:
+        logger.error('403: Invalid token.')
+        abort(403, 'Token is invalid.')
+
 
 def _get_request_json(sent_request: request, required_keys: list = None):
     # build list of required keys
@@ -108,6 +140,7 @@ def _get_request_json(sent_request: request, required_keys: list = None):
     else:
         logger.error('405: Not a POST request.')
         abort(405)
+
 
 def send_request(req_specs):
     """ Creates a MedGraph based on the input of the user.
@@ -138,4 +171,4 @@ def send_request(req_specs):
 
 if __name__ == "__main__":
     tokens = configure()
-    app.run(port=8050, debug = True)
+    app.run(port=8050, debug=False)

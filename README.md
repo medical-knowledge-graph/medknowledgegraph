@@ -20,9 +20,12 @@ API documentation and usage guide.
 4. Usage
 
 ## 1. install
-*** IMPORTANT *** 
+*** IMPORTANT ***
+
 In order to use the Neo4jConnector you have to enter the necessary neo4j credentials + url into the `pymedgraph/localconfig.json`
-*** END ***
+
+***  ***
+
 Create a new Environment with <b>Python 3.7</b>, which is required for the scispacy model.
 Then clone the repository. 
 Activate your python 3.7 environment and change your directory to the package folder
@@ -110,9 +113,9 @@ the predecessor source node. The `PipeOutpu`s are then passed in the `app.py` to
 ## 3. API
 The api documentation can be found under /pymedgraph/swagger/swagger3_template.yaml and can be passed to the swagger
 editor. The api offers three different routes, which have a more detailed description in the documentation.
-1. /buildGraph : used by the frontend to build a Knowledge Graph
-2. /searchTerms : used by the frontend to get all existing search term nodes of the neo4j graph database
-3. /intersection : can be used for graph analysis and returns node intersections on passed graph level for search terms
+1. /buildGraph (POST): used by the frontend to build a Knowledge Graph
+2. /searchTerms (GET): used by the frontend to get all existing search term nodes of the neo4j graph database
+3. /intersection (GET): can be used for graph analysis and returns node intersections on passed graph level for search terms
 
 ## 4. usage of main classes
 ### Manager

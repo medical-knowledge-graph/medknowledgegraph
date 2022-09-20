@@ -20,7 +20,7 @@ paths:
       summary: Building KnowledgeGraph
       description: >-
         Request to fetch data from Pubmed and other sources to build a Subgraph
-        in neo4j instance
+        in neo4j instance.
       operationId: buildGraph
       requestBody:
         description: Start processing of data fetch, info gathering and graph build
@@ -64,7 +64,10 @@ paths:
       tags:
         - neo4j
       summary: Get intersection count of search terms per level
-      description: Send a query to neo4j knowledge graph and calculates intersection between given parameters
+      description: >-
+        Send a query to neo4j knowledge graph and calculates intersection between passed search terms on given graph level. The response is a tuple in json format.
+        First element contains success massage, second the actual intersection data in a list.
+        The list elements can be transformed to a pandas DataFrame.
       parameters:
         - in: "path"
           name: searchTerms
@@ -92,7 +95,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SearchTermsResp'
+                $ref: '#/components/schemas/IntersectionResp'
 components:
   schemas:
     BuildGraphReq:
@@ -186,14 +189,27 @@ components:
         run:
           type: boolean
           example: true
-    SearchTermReq:
-      required:
-        - token
-      type: object
-      properties:
-        token:
-          type: string
-          example: XT0K3NX
+    IntersectionResp:
+      type: array
+      items:
+        oneOf:
+          - type: string
+            example: success
+          - $ref: '#/components/schemas/IntersectionDataResp'
+    IntersectionDataResp:
+      type: array
+      items:
+        type: object
+        properties:
+          e1:
+            type: string
+            example: epilepsy
+          e2:
+            type: string
+            example: phenylketonuria
+          DISEASE:
+            type: integer
+            example: 325
     SearchTermsResp:
       type: object
       properties:
