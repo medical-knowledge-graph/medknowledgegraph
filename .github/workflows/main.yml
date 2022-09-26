@@ -39,8 +39,8 @@ jobs:
       - name: Open tunnel to karlvm
         run: ssh -L ${{ secrets.TUNNEL_TO_KARLVM_IP }} ${{ secrets.KARLVM_USERNAME }} -J ${{ secrets.JUMPHOST_IP }}
 
-      # TODO: Push to VM
-      - name: TODO Push to VM
-        run: |
-              echo Pushing...
-              echo to VM...
+      # Push to VM
+      - name: Push to VM
+        uses: docker/build-push-action@v2
+        with:
+          push: true
