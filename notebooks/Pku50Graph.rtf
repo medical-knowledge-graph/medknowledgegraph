@@ -1,0 +1,1932 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2638
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\froman\fcharset0 Times-Roman;\f2\fmodern\fcharset0 Courier;
+\f3\fnil\fcharset0 Menlo-Regular;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;\red115\green138\blue4;\red255\green255\blue254;
+\red38\green38\blue38;\red71\green91\blue98;\red37\green146\blue134;\red165\green119\blue5;\red115\green138\blue4;
+\red255\green255\blue254;\red71\green91\blue98;\red165\green119\blue5;}
+{\*\expandedcolortbl;;\cssrgb\c0\c0\c0;\cssrgb\c52157\c60000\c0;\cssrgb\c100000\c100000\c99608;
+\cssrgb\c20000\c20000\c20000;\cssrgb\c34510\c43137\c45882;\cssrgb\c16471\c63137\c59608;\cssrgb\c70980\c53725\c0;\cssrgb\c52157\c60000\c0;
+\cssrgb\c100000\c100000\c99608;\cssrgb\c34510\c43137\c45882;\cssrgb\c70980\c53725\c0;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww20320\viewh9520\viewkind0
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 # Search Term in Graph\
+\pard\pardeftab720\partightenfactor0
+
+\f1 \cf0 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 MATCH (s:SearchTerm) RETURN s.label\
+"phenylketonuria"\
+\
+# Count of all Nodes\
+\pard\pardeftab720\partightenfactor0
+\cf0 MATCH (n) RETURN COUNT(n)\
+\pard\pardeftab720\partightenfactor0
+
+\f2\fs26 \cf0 \strokec2 1297\
+\
+# count paper\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs24 \cf0 \strokec2 MATCH (n:Paper) RETURN COUNT(n)\
+50\
+\
+# count disease\
+\pard\pardeftab720\partightenfactor0
+\cf0 MATCH (n:DISEASE) RETURN COUNT(n)\
+109\
+\
+# count chemical\
+\pard\pardeftab720\partightenfactor0
+\cf0 \outl0\strokewidth0 MATCH (n:CHEMICAL) RETURN COUNT(n)\outl0\strokewidth0 \strokec2 \
+\pard\pardeftab720\partightenfactor0
+
+\f2\fs26 \cf0 \strokec2 61\
+\
+# count umls\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs24 \cf0 \outl0\strokewidth0 MATCH (n:UMLS) RETURN COUNT(n)
+\f2\fs26 \outl0\strokewidth0 \strokec2 \
+\pard\pardeftab720\partightenfactor0
+\cf0 407\
+\pard\pardeftab720\partightenfactor0
+\cf0 \
+\pard\pardeftab720\partightenfactor0
+\cf0 \outl0\strokewidth0 # count Gene\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs24 \cf0 MATCH (n:Gene) RETURN COUNT(n)
+\f2\fs26 \
+20\
+\
+\pard\pardeftab720\partightenfactor0
+\cf0 # count snomed\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs24 \cf0 MATCH (n:SnomedConcept) RETURN COUNT(n)
+\f2\fs26 \
+\pard\pardeftab720\partightenfactor0
+\cf0 \outl0\strokewidth0 \strokec2 36\outl0\strokewidth0 \
+\pard\pardeftab720\partightenfactor0
+\cf0 \
+# count ClinicalFeature\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs24 \cf0 MATCH (n: 
+\f2\fs26 ClinicalFeature
+\f1\fs24 ) RETURN COUNT(n)
+\f2\fs26 \
+61\
+\
+# count Protein\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs24 \cf0 MATCH (n:Protein) RETURN COUNT(n)
+\f2\fs26 \
+20\
+\
+# count GO\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs24 \cf0 MATCH (n:UMLS) RETURN COUNT(n)
+\f2\fs26 \
+532\
+\
+# get DISEASE nodes with most links\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs24 \cf3 \cb4 \outl0\strokewidth0 \strokec3 MATCH\cf5 \strokec5  \cf6 \strokec6 (\cf5 \strokec5 p\cf6 \strokec6 :\cf5 \strokec5 Paper\cf6 \strokec6 )-[]->(\cf0 \cb4 \strokec2 d\cf6 \cb4 \strokec6 :\cf5 \strokec5 DISEASE\cf6 \strokec6 )\cf0 \cb1 \strokec2 \
+\cf3 \cb4 \strokec3 RETURN\cf5 \strokec5  \cf0 \cb4 \strokec2 d\cf6 \cb4 \strokec6 ,\cf5 \strokec5  COLLECT\cf6 \strokec6 (\cf0 \cb4 \strokec2 d\cf6 \cb4 \strokec6 )\cf5 \strokec5  \cf3 \strokec3 as\cf5 \strokec5  disease\cf0 \cb1 \strokec2 \
+\cf3 \cb4 \strokec3 ORDER\cf5 \strokec5  \cf3 \strokec3 BY\cf5 \strokec5  SIZE\cf6 \strokec6 (\cf5 \strokec5 disease\cf6 \strokec6 )\cf5 \strokec5  \cf3 \strokec3 DESC\cf5 \strokec5  \cf3 \strokec3 LIMIT\cf5 \strokec5  \cf7 \strokec7 10
+\f2\fs18 \cf0 \cb1 \strokec2 \
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs24 \cf0 \strokec2 \
+\pard\pardeftab720\partightenfactor0
+
+\f3\fs18 \cf0 \strokec2 \uc0\u9554 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9572 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9557 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 "d"                               
+\f3 \uc0\u9474 
+\f2 "disease"                                                             
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9566 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9578 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9569 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 \{"text":"phenylketonuria"\}        
+\f3 \uc0\u9474 
+\f2 [\{"text":"phenylketonuria"\},\{"text":"phenylketonuria"\},\{"text":"phenyl
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2                                   
+\f3 \uc0\u9474 
+\f2 ketonuria"\},\{"text":"phenylketonuria"\},\{"text":"phenylketonuria"\},\{"te
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2                                   
+\f3 \uc0\u9474 
+\f2 xt":"phenylketonuria"\},\{"text":"phenylketonuria"\},\{"text":"phenylketon
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2                                   
+\f3 \uc0\u9474 
+\f2 uria"\},\{"text":"phenylketonuria"\},\{"text":"phenylketonuria"\},\{"text":"
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2                                   
+\f3 \uc0\u9474 
+\f2 phenylketonuria"\},\{"text":"phenylketonuria"\},\{"text":"phenylketonuria"
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2                                   
+\f3 \uc0\u9474 
+\f2 \},\{"text":"phenylketonuria"\},\{"text":"phenylketonuria"\},\{"text":"pheny
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2                                   
+\f3 \uc0\u9474 
+\f2 lketonuria"\},\{"text":"phenylketonuria"\},\{"text":"phenylketonuria"\},\{"t
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2                                   
+\f3 \uc0\u9474 
+\f2 ext":"phenylketonuria"\},\{"text":"phenylketonuria"\},\{"text":"phenylketo
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2                                   
+\f3 \uc0\u9474 
+\f2 nuria"\},\{"text":"phenylketonuria"\},\{"text":"phenylketonuria"\},\{"text":
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2                                   
+\f3 \uc0\u9474 
+\f2 "phenylketonuria"\},\{"text":"phenylketonuria"\},\{"text":"phenylketonuria
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2                                   
+\f3 \uc0\u9474 
+\f2 "\},\{"text":"phenylketonuria"\},\{"text":"phenylketonuria"\},\{"text":"phen
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2                                   
+\f3 \uc0\u9474 
+\f2 ylketonuria"\},\{"text":"phenylketonuria"\},\{"text":"phenylketonuria"\},\{"
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2                                   
+\f3 \uc0\u9474 
+\f2 text":"phenylketonuria"\},\{"text":"phenylketonuria"\},\{"text":"phenylket
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2                                   
+\f3 \uc0\u9474 
+\f2 onuria"\},\{"text":"phenylketonuria"\},\{"text":"phenylketonuria"\},\{"text"
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2                                   
+\f3 \uc0\u9474 
+\f2 :"phenylketonuria"\},\{"text":"phenylketonuria"\},\{"text":"phenylketonuri
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2                                   
+\f3 \uc0\u9474 
+\f2 a"\},\{"text":"phenylketonuria"\},\{"text":"phenylketonuria"\},\{"text":"phe
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2                                   
+\f3 \uc0\u9474 
+\f2 nylketonuria"\},\{"text":"phenylketonuria"\},\{"text":"phenylketonuria"\},\{
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2                                   
+\f3 \uc0\u9474 
+\f2 "text":"phenylketonuria"\},\{"text":"phenylketonuria"\},\{"text":"phenylke
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2                                   
+\f3 \uc0\u9474 
+\f2 tonuria"\},\{"text":"phenylketonuria"\},\{"text":"phenylketonuria"\},\{"text
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2                                   
+\f3 \uc0\u9474 
+\f2 ":"phenylketonuria"\}]                                                 
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9500 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9532 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9508 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 \{"text":"pku"\}                    
+\f3 \uc0\u9474 
+\f2 [\{"text":"pku"\},\{"text":"pku"\},\{"text":"pku"\},\{"text":"pku"\},\{"text":"
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2                                   
+\f3 \uc0\u9474 
+\f2 pku"\},\{"text":"pku"\},\{"text":"pku"\},\{"text":"pku"\},\{"text":"pku"\},\{"te
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2                                   
+\f3 \uc0\u9474 
+\f2 xt":"pku"\},\{"text":"pku"\},\{"text":"pku"\},\{"text":"pku"\},\{"text":"pku"\}
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2                                   
+\f3 \uc0\u9474 
+\f2 ,\{"text":"pku"\},\{"text":"pku"\},\{"text":"pku"\},\{"text":"pku"\},\{"text":"
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2                                   
+\f3 \uc0\u9474 
+\f2 pku"\},\{"text":"pku"\},\{"text":"pku"\},\{"text":"pku"\},\{"text":"pku"\},\{"te
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2                                   
+\f3 \uc0\u9474 
+\f2 xt":"pku"\},\{"text":"pku"\},\{"text":"pku"\},\{"text":"pku"\},\{"text":"pku"\}
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2                                   
+\f3 \uc0\u9474 
+\f2 ,\{"text":"pku"\},\{"text":"pku"\}]                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9500 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9532 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9508 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 \{"text":"metabolic disease"\}      
+\f3 \uc0\u9474 
+\f2 [\{"text":"metabolic disease"\},\{"text":"metabolic disease"\},\{"text":"me
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2                                   
+\f3 \uc0\u9474 
+\f2 tabolic disease"\},\{"text":"metabolic disease"\}]                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9500 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9532 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9508 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 \{"text":"anxiety"\}                
+\f3 \uc0\u9474 
+\f2 [\{"text":"anxiety"\},\{"text":"anxiety"\},\{"text":"anxiety"\},\{"text":"anx
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2                                   
+\f3 \uc0\u9474 
+\f2 iety"\}]                                                               
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9500 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9532 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9508 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 \{"text":"hyperphenylalanemia"\}    
+\f3 \uc0\u9474 
+\f2 [\{"text":"hyperphenylalanemia"\},\{"text":"hyperphenylalanemia"\},\{"text"
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2                                   
+\f3 \uc0\u9474 
+\f2 :"hyperphenylalanemia"\},\{"text":"hyperphenylalanemia"\}]               
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9500 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9532 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9508 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 \{"text":"intellectual disability"\}
+\f3 \uc0\u9474 
+\f2 [\{"text":"intellectual disability"\},\{"text":"intellectual disability"\}
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2                                   
+\f3 \uc0\u9474 
+\f2 ,\{"text":"intellectual disability"\},\{"text":"intellectual disability"\}
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2                                   
+\f3 \uc0\u9474 
+\f2 ]                                                                     
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9500 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9532 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9508 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 \{"text":"hyperphenylalaninemia"\}  
+\f3 \uc0\u9474 
+\f2 [\{"text":"hyperphenylalaninemia"\},\{"text":"hyperphenylalaninemia"\},\{"t
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2                                   
+\f3 \uc0\u9474 
+\f2 ext":"hyperphenylalaninemia"\}]                                        
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9500 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9532 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9508 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 \{"text":"depression"\}             
+\f3 \uc0\u9474 
+\f2 [\{"text":"depression"\},\{"text":"depression"\},\{"text":"depression"\}]   
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9500 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9532 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9508 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 \{"text":"disorder"\}               
+\f3 \uc0\u9474 
+\f2 [\{"text":"disorder"\},\{"text":"disorder"\}]                             
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9500 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9532 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9508 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 \{"text":"brain dysfunction"\}      
+\f3 \uc0\u9474 
+\f2 [\{"text":"brain dysfunction"\},\{"text":"brain dysfunction"\}]           
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9492 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9524 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9496 \
+\
+
+\fs26 \
+# get UMLS from phenylketonuria DISAESE node\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs24 \cf3 \cb4 \strokec3 MATCH\cf5 \strokec5  \cf6 \strokec6 (\cf0 \cb4 \strokec2 d\cf6 \cb4 \strokec6 :\cf5 \strokec5 DISEASE \cf6 \strokec6 \{\cf5 \strokec5 text\cf6 \strokec6 :\cf5 \strokec5  \cf8 \strokec8 "phenylketonuria"\cf6 \strokec6 \})-[]->(\cf5 \strokec5 u\cf6 \strokec6 :\cf5 \strokec5 UMLS\cf6 \strokec6 )\cf5 \strokec5  \cf3 \strokec3 RETURN\cf5 \strokec5  \cf6 \strokec6 *\cf0 \cb1 \strokec2 \
+\pard\pardeftab720\partightenfactor0
+
+\f3\fs26 \cf0 \strokec2 \uc0\u9554 
+\fs18 \uc0\u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9572 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9557 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 "d"                       
+\f3 \uc0\u9474 
+\f2 "u"                                                                   
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9566 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9578 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9569 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 \{"text":"phenylketonuria"\}
+\f3 \uc0\u9474 
+\f2 \{"CUI":"C0031485","name":"Phenylketonurias","Definition":"A group of a
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2                           
+\f3 \uc0\u9474 
+\f2 utosomal recessive disorders marked by a deficiency of the hepatic enz
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2                           
+\f3 \uc0\u9474 
+\f2 yme PHENYLALANINE HYDROXYLASE or less frequently by reduced activity o
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2                           
+\f3 \uc0\u9474 
+\f2 f DIHYDROPTERIDINE REDUCTASE (i.e., atypical phenylketonuria). Classic
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2                           
+\f3 \uc0\u9474 
+\f2 al phenylketonuria is caused by a severe deficiency of phenylalanine h
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2                           
+\f3 \uc0\u9474 
+\f2 ydroxylase and presents in infancy with developmental delay; SEIZURES;
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2                           
+\f3 \uc0\u9474 
+\f2  skin HYPOPIGMENTATION; ECZEMA; and demyelination in the central nervo
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2                           
+\f3 \uc0\u9474 
+\f2 us system. (From Adams et al., Principles of Neurology, 6th ed, p952).
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2                           
+\f3 \uc0\u9474 
+\f2 "\}                                                                    
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9500 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9532 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9508 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 \{"text":"phenylketonuria"\}
+\f3 \uc0\u9474 
+\f2 \{"CUI":"C0268465","name":"Phenylketonuria II","Definition":"An autosom
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2                           
+\f3 \uc0\u9474 
+\f2 al recessive condition caused by mutation(s) in the QDPR gene, encodin
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2                           
+\f3 \uc0\u9474 
+\f2 g dihydropteridine reductase. It is characterized by BH4-defecient hyp
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2                           
+\f3 \uc0\u9474 
+\f2 erphenylalanemia, depletion of dopamine and serotonin, and progressive
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2                           
+\f3 \uc0\u9474 
+\f2  cognitive and motor deficits."\}                                      
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9500 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9532 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9508 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 \{"text":"phenylketonuria"\}
+\f3 \uc0\u9474 
+\f2 \{"CUI":"C0751434","name":"Classical phenylketonuria","Definition":"A g
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2                           
+\f3 \uc0\u9474 
+\f2 enetic disorder caused by a mutation in the gene that encodes the enzy
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2                           
+\f3 \uc0\u9474 
+\f2 me phenylalanine hydroxylase, resulting in a severe form of phenylketo
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2                           
+\f3 \uc0\u9474 
+\f2 nuria."\}                                                              
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9500 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9532 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9508 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 \{"text":"phenylketonuria"\}
+\f3 \uc0\u9474 
+\f2 \{"CUI":"C0085547","name":"Phenylketonuria, Maternal","Definition":"A c
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2                           
+\f3 \uc0\u9474 
+\f2 ondition occurring in untreated or partially treated females with PHEN
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2                           
+\f3 \uc0\u9474 
+\f2 YLKETONURIA when they become pregnant. This may result in damages to t
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2                           
+\f3 \uc0\u9474 
+\f2 he FETUS, including MICROCEPHALY; MENTAL RETARDATION; congenital heart
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2                           
+\f3 \uc0\u9474 
+\f2  disease; FETAL GROWTH RETARDATION; and CRANIOFACIAL ABNORMALITIES. (F
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2                           
+\f3 \uc0\u9474 
+\f2 rom Am J Med Genet 1997 Mar 3;69(1):89-95)"\}                          
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9492 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9524 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 
+\f2 \
+\pard\pardeftab720\partightenfactor0
+
+\fs26 \cf0 \
+\
+# get Genes for 
+\f3 \outl0\strokewidth0 phenylketonuria DISAESE node
+\f2 \outl0\strokewidth0 \strokec2 \
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs24 \cf3 \cb4 \strokec3 MATCH\cf5 \strokec5  \cf6 \strokec6 (\cf0 \cb4 \strokec2 d\cf6 \cb4 \strokec6 :\cf5 \strokec5 DISEASE \cf6 \strokec6 \{\cf5 \strokec5 text\cf6 \strokec6 :\cf5 \strokec5  \cf8 \strokec8 "phenylketonuria"\cf6 \strokec6 \})-[]->(\cf5 \strokec5 u\cf6 \strokec6 :\cf5 \strokec5 UMLS\cf6 \strokec6 )-[]->(\cf5 \strokec5 g\cf6 \strokec6 :\cf5 \strokec5 Gene\cf6 \strokec6 )\cf5 \strokec5  \cf3 \strokec3 RETURN\cf5 \strokec5  \cf6 \strokec6 *\cf0 \cb1 \strokec2 \
+\pard\pardeftab720\partightenfactor0
+
+\f3\fs18 \cf0 \strokec2 \uc0\u9554 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9572 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9572 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9557 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 "d"                       
+\f3 \uc0\u9474 
+\f2 "g"            
+\f3 \uc0\u9474 
+\f2 "u"                                                                   
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9566 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9578 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9578 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9569 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 \{"text":"phenylketonuria"\}
+\f3 \uc0\u9474 
+\f2 \{"gene":"QDPR"\}
+\f3 \uc0\u9474 
+\f2 \{"CUI":"C0268465","name":"Phenylketonuria II","Definition":"An autosom
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2                           
+\f3 \uc0\u9474 
+\f2                
+\f3 \uc0\u9474 
+\f2 al recessive condition caused by mutation(s) in the QDPR gene, encodin
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2                           
+\f3 \uc0\u9474 
+\f2                
+\f3 \uc0\u9474 
+\f2 g dihydropteridine reductase. It is characterized by BH4-defecient hyp
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2                           
+\f3 \uc0\u9474 
+\f2                
+\f3 \uc0\u9474 
+\f2 erphenylalanemia, depletion of dopamine and serotonin, and progressive
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2                           
+\f3 \uc0\u9474 
+\f2                
+\f3 \uc0\u9474 
+\f2  cognitive and motor deficits."\}                                      
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9500 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9532 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9532 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9508 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 \{"text":"phenylketonuria"\}
+\f3 \uc0\u9474 
+\f2 \{"gene":"PAH"\} 
+\f3 \uc0\u9474 
+\f2 \{"CUI":"C0031485","name":"Phenylketonurias","Definition":"A group of a
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2                           
+\f3 \uc0\u9474 
+\f2                
+\f3 \uc0\u9474 
+\f2 utosomal recessive disorders marked by a deficiency of the hepatic enz
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2                           
+\f3 \uc0\u9474 
+\f2                
+\f3 \uc0\u9474 
+\f2 yme PHENYLALANINE HYDROXYLASE or less frequently by reduced activity o
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2                           
+\f3 \uc0\u9474 
+\f2                
+\f3 \uc0\u9474 
+\f2 f DIHYDROPTERIDINE REDUCTASE (i.e., atypical phenylketonuria). Classic
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2                           
+\f3 \uc0\u9474 
+\f2                
+\f3 \uc0\u9474 
+\f2 al phenylketonuria is caused by a severe deficiency of phenylalanine h
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2                           
+\f3 \uc0\u9474 
+\f2                
+\f3 \uc0\u9474 
+\f2 ydroxylase and presents in infancy with developmental delay; SEIZURES;
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2                           
+\f3 \uc0\u9474 
+\f2                
+\f3 \uc0\u9474 
+\f2  skin HYPOPIGMENTATION; ECZEMA; and demyelination in the central nervo
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2                           
+\f3 \uc0\u9474 
+\f2                
+\f3 \uc0\u9474 
+\f2 us system. (From Adams et al., Principles of Neurology, 6th ed, p952).
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2                           
+\f3 \uc0\u9474 
+\f2                
+\f3 \uc0\u9474 
+\f2 "\}                                                                    
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9492 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9524 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9524 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9496 
+\f2\fs26 \
+\pard\pardeftab720\partightenfactor0
+\cf0 \
+\pard\pardeftab720\partightenfactor0
+\cf0 \outl0\strokewidth0 # get Proteins of found Genes\
+
+\f1\fs24 \cf9 \cb10 MATCH\cf5  \cf11 (\cf5 p\cf11 :\cf5 Protein\cf11 )\cf0 \cb1 \
+\cf9 \cb10 WHERE\cf5  p\cf11 .\cf5 GeneNames \cf9 CONTAINS\cf5  \cf12 'PAH'\cf5  \cf9 or\cf5  p\cf11 .\cf5 GeneNames \cf9 CONTAINS\cf5  \cf12 'QDPR'\cf0 \cb1 \
+\cf9 \cb10 RETURN\cf5  p\cf11 \
+\pard\pardeftab720\partightenfactor0
+
+\f3\fs26 \cf0 \cb1 \outl0\strokewidth0 \strokec2 \uc0\u9554 
+\fs18 \uc0\u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9557 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 "p"                                                                   
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9566 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9569 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 \{"Function":"FUNCTION: Catalyzes the hydroxylation of L-phenylalanine 
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 to L-tyrosine. \{ECO:0000269|PubMed:18460651, ECO:0000269|PubMed:188355
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 79\}.","Organism":"Homo sapiens (Human)","GeneNames":"PAH","Entry":"P00
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 439","name":"Phenylalanine-4-hydroxylase ","uniProtUrl":"https://www.u
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 niprot.org/uniprotkb/P00439","ProteinNames":"Phenylalanine-4-hydroxyla
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 se (PAH) (EC 1.14.16.1) (Phe-4-monooxygenase)"\}                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9500 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9508 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 \{"Function":"FUNCTION: Catalyzes the conversion of quinonoid dihydrobi
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 opterin into tetrahydrobiopterin. \{ECO:0000269|PubMed:3033643, ECO:000
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 0269|PubMed:8262916\}.","Organism":"Homo sapiens (Human)","GeneNames":"
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 QDPR DHPR SDR33C1","Entry":"P09417","name":"Dihydropteridine reductase
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2  ","uniProtUrl":"https://www.uniprot.org/uniprotkb/P09417","ProteinNam
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 es":"Dihydropteridine reductase (EC 1.5.1.34) (HDHPR) (Quinoid dihydro
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 pteridine reductase) (Short chain dehydrogenase/reductase family 33C m
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 ember 1)"\}                                                            
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9492 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9496 
+\f2\fs26 \
+\pard\pardeftab720\partightenfactor0
+\cf0 \
+\pard\pardeftab720\partightenfactor0
+\cf0 \
+\
+# get Proteins and GO\'b4s of found Genes\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs24 \cf3 \cb4 \strokec3 MATCH\cf5 \strokec5  \cf6 \strokec6 (\cf5 \strokec5 p\cf6 \strokec6 :\cf5 \strokec5 Protein\cf6 \strokec6 )-[]->(\cf5 \strokec5 go\cf6 \strokec6 :\cf5 \strokec5 GO\cf6 \strokec6 )\cf0 \cb1 \strokec2 \
+\cf3 \cb4 \strokec3 WHERE\cf5 \strokec5  p\cf6 \strokec6 .\cf5 \strokec5 GeneNames \cf3 \strokec3 CONTAINS\cf5 \strokec5  \cf8 \strokec8 'PAH'\cf5 \strokec5  \cf3 \strokec3 or\cf5 \strokec5  p\cf6 \strokec6 .\cf5 \strokec5 GeneNames \cf3 \strokec3 CONTAINS\cf5 \strokec5  \cf8 \strokec8 'QDPR'\cf0 \cb1 \strokec2 \
+\cf3 \cb4 \strokec3 RETURN\cf5 \strokec5  p\cf6 \strokec6 ,\cf5 \strokec5  go\cf0 \cb1 \strokec2 \
+\pard\pardeftab720\partightenfactor0
+
+\f3\fs18 \cf0 \strokec2 \uc0\u9554 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9572 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9557 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 "p"                                                                   
+\f3 \uc0\u9474 
+\f2 "go"                                                                  
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9566 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9578 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9569 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 \{"Function":"FUNCTION: Catalyzes the hydroxylation of L-phenylalanine 
+\f3 \uc0\u9474 
+\f2 \{"GoID":"GO:0005829","name":"cytosol","GoType":"cellular component"\}  
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 to L-tyrosine. \{ECO:0000269|PubMed:18460651, ECO:0000269|PubMed:188355
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 79\}.","Organism":"Homo sapiens (Human)","GeneNames":"PAH","Entry":"P00
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 439","name":"Phenylalanine-4-hydroxylase ","uniProtUrl":"https://www.u
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 niprot.org/uniprotkb/P00439","ProteinNames":"Phenylalanine-4-hydroxyla
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 se (PAH) (EC 1.14.16.1) (Phe-4-monooxygenase)"\}                       
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9500 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9532 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9508 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 \{"Function":"FUNCTION: Catalyzes the hydroxylation of L-phenylalanine 
+\f3 \uc0\u9474 
+\f2 \{"GoID":"GO:0042423","name":"catecholamine biosynthetic process","GoTy
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 to L-tyrosine. \{ECO:0000269|PubMed:18460651, ECO:0000269|PubMed:188355
+\f3 \uc0\u9474 
+\f2 pe":"biological process"\}                                             
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 79\}.","Organism":"Homo sapiens (Human)","GeneNames":"PAH","Entry":"P00
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 439","name":"Phenylalanine-4-hydroxylase ","uniProtUrl":"https://www.u
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 niprot.org/uniprotkb/P00439","ProteinNames":"Phenylalanine-4-hydroxyla
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 se (PAH) (EC 1.14.16.1) (Phe-4-monooxygenase)"\}                       
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9500 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9532 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9508 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 \{"Function":"FUNCTION: Catalyzes the hydroxylation of L-phenylalanine 
+\f3 \uc0\u9474 
+\f2 \{"GoID":"GO:0042136","name":"neurotransmitter biosynthetic process","G
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 to L-tyrosine. \{ECO:0000269|PubMed:18460651, ECO:0000269|PubMed:188355
+\f3 \uc0\u9474 
+\f2 oType":"biological process"\}                                          
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 79\}.","Organism":"Homo sapiens (Human)","GeneNames":"PAH","Entry":"P00
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 439","name":"Phenylalanine-4-hydroxylase ","uniProtUrl":"https://www.u
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 niprot.org/uniprotkb/P00439","ProteinNames":"Phenylalanine-4-hydroxyla
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 se (PAH) (EC 1.14.16.1) (Phe-4-monooxygenase)"\}                       
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9500 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9532 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9508 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 \{"Function":"FUNCTION: Catalyzes the hydroxylation of L-phenylalanine 
+\f3 \uc0\u9474 
+\f2 \{"GoID":"GO:0008652","name":"cellular amino acid biosynthetic process"
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 to L-tyrosine. \{ECO:0000269|PubMed:18460651, ECO:0000269|PubMed:188355
+\f3 \uc0\u9474 
+\f2 ,"GoType":"biological process"\}                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 79\}.","Organism":"Homo sapiens (Human)","GeneNames":"PAH","Entry":"P00
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 439","name":"Phenylalanine-4-hydroxylase ","uniProtUrl":"https://www.u
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 niprot.org/uniprotkb/P00439","ProteinNames":"Phenylalanine-4-hydroxyla
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 se (PAH) (EC 1.14.16.1) (Phe-4-monooxygenase)"\}                       
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9500 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9532 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9508 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 \{"Function":"FUNCTION: Catalyzes the hydroxylation of L-phenylalanine 
+\f3 \uc0\u9474 
+\f2 \{"GoID":"GO:0005506","name":"iron ion binding","GoType":"molecular fun
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 to L-tyrosine. \{ECO:0000269|PubMed:18460651, ECO:0000269|PubMed:188355
+\f3 \uc0\u9474 
+\f2 ction"\}                                                               
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 79\}.","Organism":"Homo sapiens (Human)","GeneNames":"PAH","Entry":"P00
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 439","name":"Phenylalanine-4-hydroxylase ","uniProtUrl":"https://www.u
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 niprot.org/uniprotkb/P00439","ProteinNames":"Phenylalanine-4-hydroxyla
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 se (PAH) (EC 1.14.16.1) (Phe-4-monooxygenase)"\}                       
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9500 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9532 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9508 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 \{"Function":"FUNCTION: Catalyzes the hydroxylation of L-phenylalanine 
+\f3 \uc0\u9474 
+\f2 \{"GoID":"GO:0006571","name":"tyrosine biosynthetic process","GoType":"
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 to L-tyrosine. \{ECO:0000269|PubMed:18460651, ECO:0000269|PubMed:188355
+\f3 \uc0\u9474 
+\f2 biological process"\}                                                  
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 79\}.","Organism":"Homo sapiens (Human)","GeneNames":"PAH","Entry":"P00
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 439","name":"Phenylalanine-4-hydroxylase ","uniProtUrl":"https://www.u
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 niprot.org/uniprotkb/P00439","ProteinNames":"Phenylalanine-4-hydroxyla
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 se (PAH) (EC 1.14.16.1) (Phe-4-monooxygenase)"\}                       
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9500 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9532 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9508 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 \{"Function":"FUNCTION: Catalyzes the hydroxylation of L-phenylalanine 
+\f3 \uc0\u9474 
+\f2 \{"GoID":"GO:0004505","name":"phenylalanine 4-monooxygenase activity","
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 to L-tyrosine. \{ECO:0000269|PubMed:18460651, ECO:0000269|PubMed:188355
+\f3 \uc0\u9474 
+\f2 GoType":"molecular function"\}                                         
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 79\}.","Organism":"Homo sapiens (Human)","GeneNames":"PAH","Entry":"P00
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 439","name":"Phenylalanine-4-hydroxylase ","uniProtUrl":"https://www.u
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 niprot.org/uniprotkb/P00439","ProteinNames":"Phenylalanine-4-hydroxyla
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 se (PAH) (EC 1.14.16.1) (Phe-4-monooxygenase)"\}                       
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9500 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9532 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9508 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 \{"Function":"FUNCTION: Catalyzes the hydroxylation of L-phenylalanine 
+\f3 \uc0\u9474 
+\f2 \{"GoID":"GO:0006559","name":"L-phenylalanine catabolic process","GoTyp
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 to L-tyrosine. \{ECO:0000269|PubMed:18460651, ECO:0000269|PubMed:188355
+\f3 \uc0\u9474 
+\f2 e":"biological process"\}                                              
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 79\}.","Organism":"Homo sapiens (Human)","GeneNames":"PAH","Entry":"P00
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 439","name":"Phenylalanine-4-hydroxylase ","uniProtUrl":"https://www.u
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 niprot.org/uniprotkb/P00439","ProteinNames":"Phenylalanine-4-hydroxyla
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 se (PAH) (EC 1.14.16.1) (Phe-4-monooxygenase)"\}                       
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9500 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9532 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9508 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 \{"Function":"FUNCTION: Catalyzes the conversion of quinonoid dihydrobi
+\f3 \uc0\u9474 
+\f2 \{"GoID":"GO:0070402","name":"NADPH binding","GoType":"molecular functi
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 opterin into tetrahydrobiopterin. \{ECO:0000269|PubMed:3033643, ECO:000
+\f3 \uc0\u9474 
+\f2 on"\}                                                                  
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 0269|PubMed:8262916\}.","Organism":"Homo sapiens (Human)","GeneNames":"
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 QDPR DHPR SDR33C1","Entry":"P09417","name":"Dihydropteridine reductase
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2  ","uniProtUrl":"https://www.uniprot.org/uniprotkb/P09417","ProteinNam
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 es":"Dihydropteridine reductase (EC 1.5.1.34) (HDHPR) (Quinoid dihydro
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 pteridine reductase) (Short chain dehydrogenase/reductase family 33C m
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 ember 1)"\}                                                            
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9500 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9532 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9508 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 \{"Function":"FUNCTION: Catalyzes the conversion of quinonoid dihydrobi
+\f3 \uc0\u9474 
+\f2 \{"GoID":"GO:0070404","name":"NADH binding","GoType":"molecular functio
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 opterin into tetrahydrobiopterin. \{ECO:0000269|PubMed:3033643, ECO:000
+\f3 \uc0\u9474 
+\f2 n"\}                                                                   
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 0269|PubMed:8262916\}.","Organism":"Homo sapiens (Human)","GeneNames":"
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 QDPR DHPR SDR33C1","Entry":"P09417","name":"Dihydropteridine reductase
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2  ","uniProtUrl":"https://www.uniprot.org/uniprotkb/P09417","ProteinNam
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 es":"Dihydropteridine reductase (EC 1.5.1.34) (HDHPR) (Quinoid dihydro
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 pteridine reductase) (Short chain dehydrogenase/reductase family 33C m
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 ember 1)"\}                                                            
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9500 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9532 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9508 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 \{"Function":"FUNCTION: Catalyzes the conversion of quinonoid dihydrobi
+\f3 \uc0\u9474 
+\f2 \{"GoID":"GO:0005829","name":"cytosol","GoType":"cellular component"\}  
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 opterin into tetrahydrobiopterin. \{ECO:0000269|PubMed:3033643, ECO:000
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 0269|PubMed:8262916\}.","Organism":"Homo sapiens (Human)","GeneNames":"
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 QDPR DHPR SDR33C1","Entry":"P09417","name":"Dihydropteridine reductase
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2  ","uniProtUrl":"https://www.uniprot.org/uniprotkb/P09417","ProteinNam
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 es":"Dihydropteridine reductase (EC 1.5.1.34) (HDHPR) (Quinoid dihydro
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 pteridine reductase) (Short chain dehydrogenase/reductase family 33C m
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 ember 1)"\}                                                            
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9500 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9532 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9508 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 \{"Function":"FUNCTION: Catalyzes the conversion of quinonoid dihydrobi
+\f3 \uc0\u9474 
+\f2 \{"GoID":"GO:0051066","name":"dihydrobiopterin metabolic process","GoTy
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 opterin into tetrahydrobiopterin. \{ECO:0000269|PubMed:3033643, ECO:000
+\f3 \uc0\u9474 
+\f2 pe":"biological process"\}                                             
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 0269|PubMed:8262916\}.","Organism":"Homo sapiens (Human)","GeneNames":"
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 QDPR DHPR SDR33C1","Entry":"P09417","name":"Dihydropteridine reductase
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2  ","uniProtUrl":"https://www.uniprot.org/uniprotkb/P09417","ProteinNam
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 es":"Dihydropteridine reductase (EC 1.5.1.34) (HDHPR) (Quinoid dihydro
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 pteridine reductase) (Short chain dehydrogenase/reductase family 33C m
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 ember 1)"\}                                                            
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9500 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9532 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9508 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 \{"Function":"FUNCTION: Catalyzes the conversion of quinonoid dihydrobi
+\f3 \uc0\u9474 
+\f2 \{"GoID":"GO:0006520","name":"cellular amino acid metabolic process","G
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 opterin into tetrahydrobiopterin. \{ECO:0000269|PubMed:3033643, ECO:000
+\f3 \uc0\u9474 
+\f2 oType":"biological process"\}                                          
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 0269|PubMed:8262916\}.","Organism":"Homo sapiens (Human)","GeneNames":"
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 QDPR DHPR SDR33C1","Entry":"P09417","name":"Dihydropteridine reductase
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2  ","uniProtUrl":"https://www.uniprot.org/uniprotkb/P09417","ProteinNam
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 es":"Dihydropteridine reductase (EC 1.5.1.34) (HDHPR) (Quinoid dihydro
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 pteridine reductase) (Short chain dehydrogenase/reductase family 33C m
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 ember 1)"\}                                                            
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9500 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9532 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9508 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 \{"Function":"FUNCTION: Catalyzes the conversion of quinonoid dihydrobi
+\f3 \uc0\u9474 
+\f2 \{"GoID":"GO:0006729","name":"tetrahydrobiopterin biosynthetic process"
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 opterin into tetrahydrobiopterin. \{ECO:0000269|PubMed:3033643, ECO:000
+\f3 \uc0\u9474 
+\f2 ,"GoType":"biological process"\}                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 0269|PubMed:8262916\}.","Organism":"Homo sapiens (Human)","GeneNames":"
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 QDPR DHPR SDR33C1","Entry":"P09417","name":"Dihydropteridine reductase
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2  ","uniProtUrl":"https://www.uniprot.org/uniprotkb/P09417","ProteinNam
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 es":"Dihydropteridine reductase (EC 1.5.1.34) (HDHPR) (Quinoid dihydro
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 pteridine reductase) (Short chain dehydrogenase/reductase family 33C m
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 ember 1)"\}                                                            
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9500 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9532 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9508 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 \{"Function":"FUNCTION: Catalyzes the conversion of quinonoid dihydrobi
+\f3 \uc0\u9474 
+\f2 \{"GoID":"GO:0070062","name":"extracellular exosome","GoType":"cellular
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 opterin into tetrahydrobiopterin. \{ECO:0000269|PubMed:3033643, ECO:000
+\f3 \uc0\u9474 
+\f2  component"\}                                                          
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 0269|PubMed:8262916\}.","Organism":"Homo sapiens (Human)","GeneNames":"
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 QDPR DHPR SDR33C1","Entry":"P09417","name":"Dihydropteridine reductase
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2  ","uniProtUrl":"https://www.uniprot.org/uniprotkb/P09417","ProteinNam
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 es":"Dihydropteridine reductase (EC 1.5.1.34) (HDHPR) (Quinoid dihydro
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 pteridine reductase) (Short chain dehydrogenase/reductase family 33C m
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 ember 1)"\}                                                            
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9500 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9532 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9508 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 \{"Function":"FUNCTION: Catalyzes the conversion of quinonoid dihydrobi
+\f3 \uc0\u9474 
+\f2 \{"GoID":"GO:0009055","name":"electron transfer activity","GoType":"mol
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 opterin into tetrahydrobiopterin. \{ECO:0000269|PubMed:3033643, ECO:000
+\f3 \uc0\u9474 
+\f2 ecular function"\}                                                     
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 0269|PubMed:8262916\}.","Organism":"Homo sapiens (Human)","GeneNames":"
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 QDPR DHPR SDR33C1","Entry":"P09417","name":"Dihydropteridine reductase
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2  ","uniProtUrl":"https://www.uniprot.org/uniprotkb/P09417","ProteinNam
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 es":"Dihydropteridine reductase (EC 1.5.1.34) (HDHPR) (Quinoid dihydro
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 pteridine reductase) (Short chain dehydrogenase/reductase family 33C m
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 ember 1)"\}                                                            
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9500 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9532 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9508 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 \{"Function":"FUNCTION: Catalyzes the conversion of quinonoid dihydrobi
+\f3 \uc0\u9474 
+\f2 \{"GoID":"GO:0006559","name":"L-phenylalanine catabolic process","GoTyp
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 opterin into tetrahydrobiopterin. \{ECO:0000269|PubMed:3033643, ECO:000
+\f3 \uc0\u9474 
+\f2 e":"biological process"\}                                              
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 0269|PubMed:8262916\}.","Organism":"Homo sapiens (Human)","GeneNames":"
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 QDPR DHPR SDR33C1","Entry":"P09417","name":"Dihydropteridine reductase
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2  ","uniProtUrl":"https://www.uniprot.org/uniprotkb/P09417","ProteinNam
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 es":"Dihydropteridine reductase (EC 1.5.1.34) (HDHPR) (Quinoid dihydro
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 pteridine reductase) (Short chain dehydrogenase/reductase family 33C m
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 ember 1)"\}                                                            
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9500 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9532 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9508 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 \{"Function":"FUNCTION: Catalyzes the conversion of quinonoid dihydrobi
+\f3 \uc0\u9474 
+\f2 \{"GoID":"GO:0004155","name":"6,7-dihydropteridine reductase activity",
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 opterin into tetrahydrobiopterin. \{ECO:0000269|PubMed:3033643, ECO:000
+\f3 \uc0\u9474 
+\f2 "GoType":"molecular function"\}                                        
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 0269|PubMed:8262916\}.","Organism":"Homo sapiens (Human)","GeneNames":"
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 QDPR DHPR SDR33C1","Entry":"P09417","name":"Dihydropteridine reductase
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2  ","uniProtUrl":"https://www.uniprot.org/uniprotkb/P09417","ProteinNam
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 es":"Dihydropteridine reductase (EC 1.5.1.34) (HDHPR) (Quinoid dihydro
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 pteridine reductase) (Short chain dehydrogenase/reductase family 33C m
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 ember 1)"\}                                                            
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9500 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9532 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9508 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 \{"Function":"FUNCTION: Catalyzes the conversion of quinonoid dihydrobi
+\f3 \uc0\u9474 
+\f2 \{"GoID":"GO:0005737","name":"cytoplasm","GoType":"cellular component"\}
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 opterin into tetrahydrobiopterin. \{ECO:0000269|PubMed:3033643, ECO:000
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 0269|PubMed:8262916\}.","Organism":"Homo sapiens (Human)","GeneNames":"
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 QDPR DHPR SDR33C1","Entry":"P09417","name":"Dihydropteridine reductase
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2  ","uniProtUrl":"https://www.uniprot.org/uniprotkb/P09417","ProteinNam
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 es":"Dihydropteridine reductase (EC 1.5.1.34) (HDHPR) (Quinoid dihydro
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 pteridine reductase) (Short chain dehydrogenase/reductase family 33C m
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9474 
+\f2 ember 1)"\}                                                            
+\f3 \uc0\u9474 
+\f2                                                                       
+\f3 \uc0\u9474 
+\f2 \
+
+\f3 \uc0\u9492 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9524 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 
+\f2 \
+\pard\pardeftab720\partightenfactor0
+
+\f1 \cf0 \strokec2 \
+\pard\pardeftab720\partightenfactor0
+
+\f2 \cf0 \strokec2 \
+}
